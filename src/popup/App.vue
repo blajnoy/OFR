@@ -14,13 +14,12 @@ export default {
   methods: {
     createPopup() {
       chrome.runtime.sendMessage({ action: 'create-window', url: this.url });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 .btn {
-
 }
 </style>
