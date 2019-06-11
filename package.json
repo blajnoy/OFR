@@ -4,13 +4,12 @@
   "description": "A Vue.js web extension",
   "author": "alexey.nik <blajnoy@gmail.com>",
   "scripts": {
-    "lint": "eslint --ext .js,.vue src",
+    "lint": "eslint --ext .js,.vue app",
     "precommit": "pretty-quick --staged",
-    "prettier": "prettier \"src/**/*.{js,vue}\"",
+    "prettier": "prettier \"app/**/*.{js,vue}\"",
     "prettier:write": "npm run prettier -- --write",
     "build": "cross-env NODE_ENV=production webpack --hide-modules",
     "build:dev": "cross-env NODE_ENV=development webpack --hide-modules",
-    "build-zip": "node scripts/build-zip.js",
     "watch": "npm run build -- --watch",
     "watch:dev": "cross-env HMR=true npm run build:dev -- --watch"
   },
