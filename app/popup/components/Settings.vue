@@ -10,10 +10,10 @@
     </div>
     <div v-show="isVisible" class="settings-wrapper">
       <div class="layouts-list">
-        <LayoutItem :sizes="layouts['1*1']" />
-        <LayoutItem :sizes="layouts['1*2']" />
-        <LayoutItem :sizes="layouts['2*1']" />
-        <LayoutItem :sizes="layouts['2*2']" />
+        <LayoutItem :sizes="layouts['1x1']" />
+        <LayoutItem :sizes="layouts['1x2']" />
+        <LayoutItem :sizes="layouts['2x1']" />
+        <LayoutItem :sizes="layouts['2x2']" />
       </div>
     </div>
   </div>
@@ -31,19 +31,19 @@ export default {
     return {
       show: false,
       layouts: {
-        '1*1': {
+        '1x1': {
           cols: 1,
           rows: 1,
         },
-        '2*1': {
+        '2x1': {
           cols: 2,
           rows: 1,
         },
-        '1*2': {
+        '1x2': {
           cols: 1,
           rows: 2,
         },
-        '2*2': {
+        '2x2': {
           cols: 2,
           rows: 2,
         },

@@ -1,7 +1,20 @@
 import * as types from './mutation-types';
 
 export default {
-  [types.UPDATE_WINDOWS](state, payload) {
-    state.windows = payload;
+  [types.INC_WINDOW](state, window) {
+    state.windows.push(window);
+  },
+  [types.INC_NEXT_WINDOW_INDEX](state, type) {
+    if (state.layouts[type].cols * state.layouts[type].rows > state.layouts[type].nextIndex) {
+      state.layouts[type].nextIndex += 1;
+    } else {
+      state.layouts[type].nextIndex = 1;
+    }
+  },
+  [types.SET_NEXT_WINDOW_INDEX](state, { type, index }) {
+    state.layouts[type].nextIndex = index;
+  },
+  [types.REMOVE_WINDOW](state, id) {
+    state.windows = state.windows.filter(window => window.id !== id);
   },
 };

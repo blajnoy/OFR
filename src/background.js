@@ -193,6 +193,19 @@
 })(
   /************************************************************************/
   /******/ {
+    /***/ '../node_modules/core-js/internals/a-function.js':
+      /*!*******************************************************!*\
+  !*** ../node_modules/core-js/internals/a-function.js ***!
+  \*******************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports) {
+        eval(
+          "module.exports = function (it) {\n  if (typeof it != 'function') {\n    throw TypeError(String(it) + ' is not a function');\n  } return it;\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/a-function.js?"
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/an-object.js':
       /*!******************************************************!*\
   !*** ../node_modules/core-js/internals/an-object.js ***!
@@ -206,6 +219,20 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/array-for-each.js':
+      /*!***********************************************************!*\
+  !*** ../node_modules/core-js/internals/array-for-each.js ***!
+  \***********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          '\nvar arrayMethods = __webpack_require__(/*! ../internals/array-methods */ "../node_modules/core-js/internals/array-methods.js");\nvar sloppyArrayMethod = __webpack_require__(/*! ../internals/sloppy-array-method */ "../node_modules/core-js/internals/sloppy-array-method.js");\n\nvar internalForEach = arrayMethods(0);\nvar SLOPPY_METHOD = sloppyArrayMethod(\'forEach\');\n\n// `Array.prototype.forEach` method implementation\n// https://tc39.github.io/ecma262/#sec-array.prototype.foreach\nmodule.exports = SLOPPY_METHOD ? function forEach(callbackfn /* , thisArg */) {\n  return internalForEach(this, callbackfn, arguments[1]);\n} : [].forEach;\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/array-for-each.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/array-includes.js':
       /*!***********************************************************!*\
   !*** ../node_modules/core-js/internals/array-includes.js ***!
@@ -214,6 +241,58 @@
       /***/ function(module, exports, __webpack_require__) {
         eval(
           'var toIndexedObject = __webpack_require__(/*! ../internals/to-indexed-object */ "../node_modules/core-js/internals/to-indexed-object.js");\nvar toLength = __webpack_require__(/*! ../internals/to-length */ "../node_modules/core-js/internals/to-length.js");\nvar toAbsoluteIndex = __webpack_require__(/*! ../internals/to-absolute-index */ "../node_modules/core-js/internals/to-absolute-index.js");\n\n// `Array.prototype.{ indexOf, includes }` methods implementation\n// false -> Array#indexOf\n// https://tc39.github.io/ecma262/#sec-array.prototype.indexof\n// true  -> Array#includes\n// https://tc39.github.io/ecma262/#sec-array.prototype.includes\nmodule.exports = function (IS_INCLUDES) {\n  return function ($this, el, fromIndex) {\n    var O = toIndexedObject($this);\n    var length = toLength(O.length);\n    var index = toAbsoluteIndex(fromIndex, length);\n    var value;\n    // Array#includes uses SameValueZero equality algorithm\n    // eslint-disable-next-line no-self-compare\n    if (IS_INCLUDES && el != el) while (length > index) {\n      value = O[index++];\n      // eslint-disable-next-line no-self-compare\n      if (value != value) return true;\n    // Array#indexOf ignores holes, Array#includes - not\n    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {\n      if (O[index] === el) return IS_INCLUDES || index || 0;\n    } return !IS_INCLUDES && -1;\n  };\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/array-includes.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/array-method-has-species-support.js':
+      /*!*****************************************************************************!*\
+  !*** ../node_modules/core-js/internals/array-method-has-species-support.js ***!
+  \*****************************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var fails = __webpack_require__(/*! ../internals/fails */ "../node_modules/core-js/internals/fails.js");\nvar wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "../node_modules/core-js/internals/well-known-symbol.js");\n\nvar SPECIES = wellKnownSymbol(\'species\');\n\nmodule.exports = function (METHOD_NAME) {\n  return !fails(function () {\n    var array = [];\n    var constructor = array.constructor = {};\n    constructor[SPECIES] = function () {\n      return { foo: 1 };\n    };\n    return array[METHOD_NAME](Boolean).foo !== 1;\n  });\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/array-method-has-species-support.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/array-methods.js':
+      /*!**********************************************************!*\
+  !*** ../node_modules/core-js/internals/array-methods.js ***!
+  \**********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var bind = __webpack_require__(/*! ../internals/bind-context */ "../node_modules/core-js/internals/bind-context.js");\nvar IndexedObject = __webpack_require__(/*! ../internals/indexed-object */ "../node_modules/core-js/internals/indexed-object.js");\nvar toObject = __webpack_require__(/*! ../internals/to-object */ "../node_modules/core-js/internals/to-object.js");\nvar toLength = __webpack_require__(/*! ../internals/to-length */ "../node_modules/core-js/internals/to-length.js");\nvar arraySpeciesCreate = __webpack_require__(/*! ../internals/array-species-create */ "../node_modules/core-js/internals/array-species-create.js");\n\n// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex }` methods implementation\n// 0 -> Array#forEach\n// https://tc39.github.io/ecma262/#sec-array.prototype.foreach\n// 1 -> Array#map\n// https://tc39.github.io/ecma262/#sec-array.prototype.map\n// 2 -> Array#filter\n// https://tc39.github.io/ecma262/#sec-array.prototype.filter\n// 3 -> Array#some\n// https://tc39.github.io/ecma262/#sec-array.prototype.some\n// 4 -> Array#every\n// https://tc39.github.io/ecma262/#sec-array.prototype.every\n// 5 -> Array#find\n// https://tc39.github.io/ecma262/#sec-array.prototype.find\n// 6 -> Array#findIndex\n// https://tc39.github.io/ecma262/#sec-array.prototype.findIndex\nmodule.exports = function (TYPE, specificCreate) {\n  var IS_MAP = TYPE == 1;\n  var IS_FILTER = TYPE == 2;\n  var IS_SOME = TYPE == 3;\n  var IS_EVERY = TYPE == 4;\n  var IS_FIND_INDEX = TYPE == 6;\n  var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;\n  var create = specificCreate || arraySpeciesCreate;\n  return function ($this, callbackfn, that) {\n    var O = toObject($this);\n    var self = IndexedObject(O);\n    var boundFunction = bind(callbackfn, that, 3);\n    var length = toLength(self.length);\n    var index = 0;\n    var target = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;\n    var value, result;\n    for (;length > index; index++) if (NO_HOLES || index in self) {\n      value = self[index];\n      result = boundFunction(value, index, O);\n      if (TYPE) {\n        if (IS_MAP) target[index] = result; // map\n        else if (result) switch (TYPE) {\n          case 3: return true;              // some\n          case 5: return value;             // find\n          case 6: return index;             // findIndex\n          case 2: target.push(value);       // filter\n        } else if (IS_EVERY) return false;  // every\n      }\n    }\n    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;\n  };\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/array-methods.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/array-species-create.js':
+      /*!*****************************************************************!*\
+  !*** ../node_modules/core-js/internals/array-species-create.js ***!
+  \*****************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var isObject = __webpack_require__(/*! ../internals/is-object */ "../node_modules/core-js/internals/is-object.js");\nvar isArray = __webpack_require__(/*! ../internals/is-array */ "../node_modules/core-js/internals/is-array.js");\nvar wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "../node_modules/core-js/internals/well-known-symbol.js");\n\nvar SPECIES = wellKnownSymbol(\'species\');\n\n// `ArraySpeciesCreate` abstract operation\n// https://tc39.github.io/ecma262/#sec-arrayspeciescreate\nmodule.exports = function (originalArray, length) {\n  var C;\n  if (isArray(originalArray)) {\n    C = originalArray.constructor;\n    // cross-realm fallback\n    if (typeof C == \'function\' && (C === Array || isArray(C.prototype))) C = undefined;\n    else if (isObject(C)) {\n      C = C[SPECIES];\n      if (C === null) C = undefined;\n    }\n  } return new (C === undefined ? Array : C)(length === 0 ? 0 : length);\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/array-species-create.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/bind-context.js':
+      /*!*********************************************************!*\
+  !*** ../node_modules/core-js/internals/bind-context.js ***!
+  \*********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var aFunction = __webpack_require__(/*! ../internals/a-function */ "../node_modules/core-js/internals/a-function.js");\n\n// optional / simple context binding\nmodule.exports = function (fn, that, length) {\n  aFunction(fn);\n  if (that === undefined) return fn;\n  switch (length) {\n    case 0: return function () {\n      return fn.call(that);\n    };\n    case 1: return function (a) {\n      return fn.call(that, a);\n    };\n    case 2: return function (a, b) {\n      return fn.call(that, a, b);\n    };\n    case 3: return function (a, b, c) {\n      return fn.call(that, a, b, c);\n    };\n  }\n  return function (/* ...args */) {\n    return fn.apply(that, arguments);\n  };\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/bind-context.js?'
         );
 
         /***/
@@ -279,6 +358,19 @@
       /***/ function(module, exports, __webpack_require__) {
         eval(
           'var global = __webpack_require__(/*! ../internals/global */ "../node_modules/core-js/internals/global.js");\nvar isObject = __webpack_require__(/*! ../internals/is-object */ "../node_modules/core-js/internals/is-object.js");\n\nvar document = global.document;\n// typeof document.createElement is \'object\' in old IE\nvar exist = isObject(document) && isObject(document.createElement);\n\nmodule.exports = function (it) {\n  return exist ? document.createElement(it) : {};\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/document-create-element.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/dom-iterables.js':
+      /*!**********************************************************!*\
+  !*** ../node_modules/core-js/internals/dom-iterables.js ***!
+  \**********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports) {
+        eval(
+          "// iterable DOM collections\n// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods\nmodule.exports = {\n  CSSRuleList: 0,\n  CSSStyleDeclaration: 0,\n  CSSValueList: 0,\n  ClientRectList: 0,\n  DOMRectList: 0,\n  DOMStringList: 0,\n  DOMTokenList: 1,\n  DataTransferItemList: 0,\n  FileList: 0,\n  HTMLAllCollection: 0,\n  HTMLCollection: 0,\n  HTMLFormElement: 0,\n  HTMLSelectElement: 0,\n  MediaList: 0,\n  MimeTypeArray: 0,\n  NamedNodeMap: 0,\n  NodeList: 1,\n  PaintRequestList: 0,\n  Plugin: 0,\n  PluginArray: 0,\n  SVGLengthList: 0,\n  SVGNumberList: 0,\n  SVGPathSegList: 0,\n  SVGPointList: 0,\n  SVGStringList: 0,\n  SVGTransformList: 0,\n  SourceBufferList: 0,\n  StyleSheetList: 0,\n  TextTrackCueList: 0,\n  TextTrackList: 0,\n  TouchList: 0\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/dom-iterables.js?"
         );
 
         /***/
@@ -425,6 +517,19 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/is-array.js':
+      /*!*****************************************************!*\
+  !*** ../node_modules/core-js/internals/is-array.js ***!
+  \*****************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var classof = __webpack_require__(/*! ../internals/classof-raw */ "../node_modules/core-js/internals/classof-raw.js");\n\n// `IsArray` abstract operation\n// https://tc39.github.io/ecma262/#sec-isarray\nmodule.exports = Array.isArray || function isArray(arg) {\n  return classof(arg) == \'Array\';\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/is-array.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/is-forced.js':
       /*!******************************************************!*\
   !*** ../node_modules/core-js/internals/is-forced.js ***!
@@ -458,6 +563,19 @@
       /*! no static exports found */
       /***/ function(module, exports) {
         eval('module.exports = false;\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/is-pure.js?');
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/native-symbol.js':
+      /*!**********************************************************!*\
+  !*** ../node_modules/core-js/internals/native-symbol.js ***!
+  \**********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var fails = __webpack_require__(/*! ../internals/fails */ "../node_modules/core-js/internals/fails.js");\n\nmodule.exports = !!Object.getOwnPropertySymbols && !fails(function () {\n  // Chrome 38 Symbol has incorrect toString conversion\n  // eslint-disable-next-line no-undef\n  return !String(Symbol());\n});\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/native-symbol.js?'
+        );
 
         /***/
       },
@@ -630,6 +748,20 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/sloppy-array-method.js':
+      /*!****************************************************************!*\
+  !*** ../node_modules/core-js/internals/sloppy-array-method.js ***!
+  \****************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          '\nvar fails = __webpack_require__(/*! ../internals/fails */ "../node_modules/core-js/internals/fails.js");\n\nmodule.exports = function (METHOD_NAME, argument) {\n  var method = [][METHOD_NAME];\n  return !method || !fails(function () {\n    // eslint-disable-next-line no-useless-call,no-throw-literal\n    method.call(null, argument || function () { throw 1; }, 1);\n  });\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/sloppy-array-method.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/to-absolute-index.js':
       /*!**************************************************************!*\
   !*** ../node_modules/core-js/internals/to-absolute-index.js ***!
@@ -682,6 +814,19 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/to-object.js':
+      /*!******************************************************!*\
+  !*** ../node_modules/core-js/internals/to-object.js ***!
+  \******************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var requireObjectCoercible = __webpack_require__(/*! ../internals/require-object-coercible */ "../node_modules/core-js/internals/require-object-coercible.js");\n\n// `ToObject` abstract operation\n// https://tc39.github.io/ecma262/#sec-toobject\nmodule.exports = function (argument) {\n  return Object(requireObjectCoercible(argument));\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/to-object.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/to-primitive.js':
       /*!*********************************************************!*\
   !*** ../node_modules/core-js/internals/to-primitive.js ***!
@@ -708,6 +853,47 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/well-known-symbol.js':
+      /*!**************************************************************!*\
+  !*** ../node_modules/core-js/internals/well-known-symbol.js ***!
+  \**************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var global = __webpack_require__(/*! ../internals/global */ "../node_modules/core-js/internals/global.js");\nvar shared = __webpack_require__(/*! ../internals/shared */ "../node_modules/core-js/internals/shared.js");\nvar uid = __webpack_require__(/*! ../internals/uid */ "../node_modules/core-js/internals/uid.js");\nvar NATIVE_SYMBOL = __webpack_require__(/*! ../internals/native-symbol */ "../node_modules/core-js/internals/native-symbol.js");\n\nvar Symbol = global.Symbol;\nvar store = shared(\'wks\');\n\nmodule.exports = function (name) {\n  return store[name] || (store[name] = NATIVE_SYMBOL && Symbol[name]\n    || (NATIVE_SYMBOL ? Symbol : uid)(\'Symbol.\' + name));\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/well-known-symbol.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/modules/es.array.filter.js':
+      /*!**********************************************************!*\
+  !*** ../node_modules/core-js/modules/es.array.filter.js ***!
+  \**********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          '\nvar $ = __webpack_require__(/*! ../internals/export */ "../node_modules/core-js/internals/export.js");\nvar arrayMethods = __webpack_require__(/*! ../internals/array-methods */ "../node_modules/core-js/internals/array-methods.js");\nvar arrayMethodHasSpeciesSupport = __webpack_require__(/*! ../internals/array-method-has-species-support */ "../node_modules/core-js/internals/array-method-has-species-support.js");\n\nvar internalFilter = arrayMethods(2);\nvar SPECIES_SUPPORT = arrayMethodHasSpeciesSupport(\'filter\');\n\n// `Array.prototype.filter` method\n// https://tc39.github.io/ecma262/#sec-array.prototype.filter\n// with adding support of @@species\n$({ target: \'Array\', proto: true, forced: !SPECIES_SUPPORT }, {\n  filter: function filter(callbackfn /* , thisArg */) {\n    return internalFilter(this, callbackfn, arguments[1]);\n  }\n});\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.array.filter.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/modules/es.array.for-each.js':
+      /*!************************************************************!*\
+  !*** ../node_modules/core-js/modules/es.array.for-each.js ***!
+  \************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          '\nvar $ = __webpack_require__(/*! ../internals/export */ "../node_modules/core-js/internals/export.js");\nvar forEach = __webpack_require__(/*! ../internals/array-for-each */ "../node_modules/core-js/internals/array-for-each.js");\n\n// `Array.prototype.forEach` method\n// https://tc39.github.io/ecma262/#sec-array.prototype.foreach\n$({ target: \'Array\', proto: true, forced: [].forEach != forEach }, {\n  forEach: forEach\n});\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.array.for-each.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/modules/es.object.define-property.js':
       /*!********************************************************************!*\
   !*** ../node_modules/core-js/modules/es.object.define-property.js ***!
@@ -716,6 +902,19 @@
       /***/ function(module, exports, __webpack_require__) {
         eval(
           'var $ = __webpack_require__(/*! ../internals/export */ "../node_modules/core-js/internals/export.js");\nvar DESCRIPTORS = __webpack_require__(/*! ../internals/descriptors */ "../node_modules/core-js/internals/descriptors.js");\nvar objectDefinePropertyModile = __webpack_require__(/*! ../internals/object-define-property */ "../node_modules/core-js/internals/object-define-property.js");\n\n// `Object.defineProperty` method\n// https://tc39.github.io/ecma262/#sec-object.defineproperty\n$({ target: \'Object\', stat: true, forced: !DESCRIPTORS, sham: !DESCRIPTORS }, {\n  defineProperty: objectDefinePropertyModile.f\n});\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.object.define-property.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/modules/web.dom-collections.for-each.js':
+      /*!***********************************************************************!*\
+  !*** ../node_modules/core-js/modules/web.dom-collections.for-each.js ***!
+  \***********************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var global = __webpack_require__(/*! ../internals/global */ "../node_modules/core-js/internals/global.js");\nvar DOMIterables = __webpack_require__(/*! ../internals/dom-iterables */ "../node_modules/core-js/internals/dom-iterables.js");\nvar forEach = __webpack_require__(/*! ../internals/array-for-each */ "../node_modules/core-js/internals/array-for-each.js");\nvar hide = __webpack_require__(/*! ../internals/hide */ "../node_modules/core-js/internals/hide.js");\n\nfor (var COLLECTION_NAME in DOMIterables) {\n  var Collection = global[COLLECTION_NAME];\n  var CollectionPrototype = Collection && Collection.prototype;\n  // some Chrome versions have non-configurable methods on DOMTokenList\n  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {\n    hide(CollectionPrototype, \'forEach\', forEach);\n  } catch (error) {\n    CollectionPrototype.forEach = forEach;\n  }\n}\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/web.dom-collections.for-each.js?'
         );
 
         /***/
@@ -796,7 +995,7 @@
       /***/ function(module, __webpack_exports__, __webpack_require__) {
         'use strict';
         eval(
-          '__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.object.define-property */ "../node_modules/core-js/modules/es.object.define-property.js");\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./store */ "./store/index.js");\n\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\n\n\nvar Bg =\n/*#__PURE__*/\nfunction () {\n  function Bg() {\n    _classCallCheck(this, Bg);\n\n    //this.findAppTab();\n    this.initListeners();\n  }\n\n  _createClass(Bg, [{\n    key: "initListeners",\n    value: function initListeners() {\n      chrome.runtime.onMessage.addListener(function (msg) {\n        if (msg.action === \'create-window\') {\n          var width = 1000;\n          var height = 800;\n          var id;\n          chrome.windows.create({\n            type: \'popup\',\n            url: msg.url,\n            width: width,\n            height: height,\n            left: screen.width / 2 - width / 2\n          }, function (window) {\n            id = window.id;\n            console.log(window);\n          });\n        }\n      });\n    }\n  }, {\n    key: "findAppTab",\n    value: function findAppTab() {\n      var _this = this;\n\n      chrome.tabs.query({\n        url: this.APP_URL,\n        windowType: \'popup\'\n      }, function (tabs) {\n        if (tabs && tabs[0] && tabs[0].id && tabs[0].windowId) {\n          _this.appTabId = tabs[0].id;\n          _this.appWindowId = tabs[0].windowId;\n        }\n      });\n    }\n  }, {\n    key: "onWindowRemoved",\n    value: function onWindowRemoved() {\n      var _this2 = this;\n\n      chrome.windows.onRemoved.addListener(function (windowId) {\n        if (windowId === _this2.appWindowId) {\n          _this2.appTabId = null;\n          _this2.appWindowId = null;\n        }\n      });\n    }\n  }, {\n    key: "onWindowFocusChanged",\n    value: function onWindowFocusChanged() {\n      var _this3 = this;\n\n      chrome.windows.onFocusChanged.addListener(function (windowId) {\n        chrome.storage.local.get({\n          windowPinned: false\n        }, function (storage) {\n          if (storage.windowPinned && _this3.appWindowId && windowId !== _this3.appWindowId) {\n            chrome.windows.update(_this3.appWindowId, {\n              focused: true\n            });\n          }\n        });\n      });\n    }\n  }]);\n\n  return Bg;\n}();\n\nvar bg = new Bg();\n\n//# sourceURL=webpack:///./background.js?'
+          '__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.array.for-each */ "../node_modules/core-js/modules/es.array.for-each.js");\n/* harmony import */ var core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.object.define-property */ "../node_modules/core-js/modules/es.object.define-property.js");\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "../node_modules/core-js/modules/web.dom-collections.for-each.js");\n/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./store */ "./store/index.js");\n\n\n\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\n\n\nvar Bg =\n/*#__PURE__*/\nfunction () {\n  function Bg() {\n    _classCallCheck(this, Bg);\n\n    //this.findAppTab();\n    this.initListeners();\n    this.onWindowRemoved();\n  }\n\n  _createClass(Bg, [{\n    key: "initListeners",\n    value: function initListeners() {\n      var _this = this;\n\n      chrome.runtime.onMessage.addListener(function (msg) {\n        if (msg.action === \'create-window\') {\n          var currentLayout = _store__WEBPACK_IMPORTED_MODULE_3__["default"].state.currentLayout;\n          var nextIndex = _store__WEBPACK_IMPORTED_MODULE_3__["default"].getters.nextIndex(currentLayout);\n\n          var _this$getSizes = _this.getSizes(currentLayout),\n              width = _this$getSizes.width,\n              height = _this$getSizes.height;\n\n          var _this$getPosition = _this.getPosition(currentLayout, nextIndex),\n              top = _this$getPosition.top,\n              left = _this$getPosition.left;\n\n          chrome.windows.create({\n            type: \'popup\',\n            url: msg.url,\n            width: width,\n            height: height,\n            top: top,\n            left: left\n          }, function (window) {\n            var newWindow = {\n              id: window.id,\n              index: nextIndex,\n              type: currentLayout\n            };\n            _store__WEBPACK_IMPORTED_MODULE_3__["default"].commit(\'INC_WINDOW\', newWindow);\n            _store__WEBPACK_IMPORTED_MODULE_3__["default"].commit(\'INC_NEXT_WINDOW_INDEX\', currentLayout);\n          });\n        }\n\n        if (msg.action === \'turn-up-window\') {\n          if (_store__WEBPACK_IMPORTED_MODULE_3__["default"].getters.windows.length) {\n            _store__WEBPACK_IMPORTED_MODULE_3__["default"].getters.windows.forEach(function (turnWindow) {\n              window.chrome.windows.update(turnWindow.id, {\n                focused: true,\n                state: \'normal\'\n              });\n            });\n          }\n        }\n      });\n    }\n  }, {\n    key: "getSizes",\n    value: function getSizes(type) {\n      var sizes = {\n        width: 1000,\n        height: 800\n      };\n\n      switch (type) {\n        case \'1x1\':\n          break;\n\n        case \'1x2\':\n          sizes.width = screen.width / 2;\n          sizes.height = screen.availHeight;\n          break;\n\n        case \'2x1\':\n          sizes.height = screen.availHeight / 2;\n          sizes.width = screen.width;\n          break;\n\n        case \'2x2\':\n          sizes.width = screen.width / 2;\n          sizes.height = screen.availHeight / 2;\n          break;\n\n        default:\n          break;\n      }\n\n      return sizes;\n    }\n  }, {\n    key: "getPosition",\n    value: function getPosition(type) {\n      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;\n      var pos = {};\n\n      switch (type) {\n        case \'1x1\':\n          pos.left = screen.width / 2 - this.getSizes(type).width / 2;\n          pos.top = screen.availHeight / 2 - this.getSizes(type).height / 2;\n          break;\n\n        case \'1x2\':\n          if (index === 2) {\n            pos.left = screen.width / 2;\n          }\n\n          break;\n\n        case \'2x1\':\n          if (index === 2) {\n            pos.top = screen.availHeight / 2;\n          }\n\n          break;\n\n        case \'2x2\':\n          if (index > 1) {\n            if (index % 2 === 0) {\n              pos.left = screen.width / 2;\n            }\n\n            if (index > 2) {\n              pos.top = screen.availHeight / 2;\n            }\n          }\n\n          break;\n\n        default:\n          break;\n      }\n\n      return pos;\n    }\n  }, {\n    key: "onWindowRemoved",\n    value: function onWindowRemoved() {\n      chrome.windows.onRemoved.addListener(function (windowId) {\n        var _store$getters$window = _store__WEBPACK_IMPORTED_MODULE_3__["default"].getters.windowById(windowId)[0],\n            index = _store$getters$window.index,\n            type = _store$getters$window.type;\n        _store__WEBPACK_IMPORTED_MODULE_3__["default"].commit(\'SET_NEXT_WINDOW_INDEX\', {\n          type: type,\n          index: index\n        });\n        _store__WEBPACK_IMPORTED_MODULE_3__["default"].commit(\'REMOVE_WINDOW\', windowId);\n      });\n    }\n  }]);\n\n  return Bg;\n}();\n\nvar bg = new Bg();\n\n//# sourceURL=webpack:///./background.js?'
         );
 
         /***/
@@ -806,11 +1005,11 @@
       /*!**************************!*\
   !*** ./store/actions.js ***!
   \**************************/
-      /*! exports provided: setWindows */
+      /*! exports provided: addWindow, removeWindow, incNextWindowIndex, setNextWindowIndex */
       /***/ function(module, __webpack_exports__, __webpack_require__) {
         'use strict';
         eval(
-          '__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setWindows", function() { return setWindows; });\n/* harmony import */ var _mutation_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mutation-types */ "./store/mutation-types.js");\n\nvar setWindows = function setWindows(_ref, payload) {\n  var commit = _ref.commit;\n  commit(_mutation_types__WEBPACK_IMPORTED_MODULE_0__["UPDATE_WINDOWS"], payload);\n};\n\n//# sourceURL=webpack:///./store/actions.js?'
+          '__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addWindow", function() { return addWindow; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeWindow", function() { return removeWindow; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "incNextWindowIndex", function() { return incNextWindowIndex; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setNextWindowIndex", function() { return setNextWindowIndex; });\n/* harmony import */ var _mutation_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mutation-types */ "./store/mutation-types.js");\n\nvar addWindow = function addWindow(_ref, window) {\n  var commit = _ref.commit;\n  commit(_mutation_types__WEBPACK_IMPORTED_MODULE_0__["INC_WINDOW"], window);\n};\nvar removeWindow = function removeWindow(_ref2, id) {\n  var commit = _ref2.commit;\n  commit(_mutation_types__WEBPACK_IMPORTED_MODULE_0__["REMOVE_WINDOW"], id);\n};\nvar incNextWindowIndex = function incNextWindowIndex(_ref3, type) {\n  var commit = _ref3.commit;\n  commit(_mutation_types__WEBPACK_IMPORTED_MODULE_0__["INC_NEXT_WINDOW_INDEX"], type);\n};\nvar setNextWindowIndex = function setNextWindowIndex(_ref4, type, index) {\n  var commit = _ref4.commit;\n  commit(_mutation_types__WEBPACK_IMPORTED_MODULE_0__["SET_NEXT_WINDOW_INDEX"], {\n    type: type,\n    index: index\n  });\n};\n\n//# sourceURL=webpack:///./store/actions.js?'
         );
 
         /***/
@@ -820,11 +1019,11 @@
       /*!**************************!*\
   !*** ./store/getters.js ***!
   \**************************/
-      /*! exports provided: windows */
+      /*! exports provided: windows, windowById, nextIndex */
       /***/ function(module, __webpack_exports__, __webpack_require__) {
         'use strict';
         eval(
-          '__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "windows", function() { return windows; });\nvar windows = function windows(state) {\n  return state.windows;\n};\n\n//# sourceURL=webpack:///./store/getters.js?'
+          '__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "windows", function() { return windows; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "windowById", function() { return windowById; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "nextIndex", function() { return nextIndex; });\n/* harmony import */ var core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.array.filter */ "../node_modules/core-js/modules/es.array.filter.js");\n/* harmony import */ var core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0__);\n\nvar windows = function windows(state) {\n  return state.windows;\n};\nvar windowById = function windowById(state) {\n  return function (id) {\n    return state.windows.filter(function (window) {\n      return window.id === id;\n    });\n  };\n};\nvar nextIndex = function nextIndex(state) {\n  return function (type) {\n    return state.layouts[type].nextIndex;\n  };\n};\n\n//# sourceURL=webpack:///./store/getters.js?'
         );
 
         /***/
@@ -838,7 +1037,7 @@
       /***/ function(module, __webpack_exports__, __webpack_require__) {
         'use strict';
         eval(
-          '__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "../node_modules/vue/dist/vue.runtime.esm.js");\n/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "../node_modules/vuex/dist/vuex.esm.js");\n/* harmony import */ var _getters__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getters */ "./store/getters.js");\n/* harmony import */ var _mutations__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./mutations */ "./store/mutations.js");\n/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./actions */ "./store/actions.js");\n\n\n\n\n\nvue__WEBPACK_IMPORTED_MODULE_0__["default"].use(vuex__WEBPACK_IMPORTED_MODULE_1__["default"]);\n/* harmony default export */ __webpack_exports__["default"] = (new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({\n  state: {\n    windows: []\n  },\n  getters: _getters__WEBPACK_IMPORTED_MODULE_2__,\n  mutations: _mutations__WEBPACK_IMPORTED_MODULE_3__["default"],\n  actions: _actions__WEBPACK_IMPORTED_MODULE_4__\n}));\n\n//# sourceURL=webpack:///./store/index.js?'
+          '__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "../node_modules/vue/dist/vue.runtime.esm.js");\n/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "../node_modules/vuex/dist/vuex.esm.js");\n/* harmony import */ var _getters__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getters */ "./store/getters.js");\n/* harmony import */ var _mutations__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./mutations */ "./store/mutations.js");\n/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./actions */ "./store/actions.js");\n\n\n\n\n\nvue__WEBPACK_IMPORTED_MODULE_0__["default"].use(vuex__WEBPACK_IMPORTED_MODULE_1__["default"]);\n/* harmony default export */ __webpack_exports__["default"] = (new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({\n  state: {\n    windows: [],\n    currentLayout: \'2x2\',\n    layouts: {\n      \'1x1\': {\n        cols: 1,\n        rows: 1,\n        nextIndex: 1\n      },\n      \'1x2\': {\n        cols: 1,\n        rows: 2,\n        nextIndex: 1\n      },\n      \'2x1\': {\n        cols: 2,\n        rows: 1,\n        nextIndex: 1\n      },\n      \'2x2\': {\n        cols: 2,\n        rows: 2,\n        nextIndex: 1\n      }\n    }\n  },\n  getters: _getters__WEBPACK_IMPORTED_MODULE_2__,\n  mutations: _mutations__WEBPACK_IMPORTED_MODULE_3__["default"],\n  actions: _actions__WEBPACK_IMPORTED_MODULE_4__\n}));\n\n//# sourceURL=webpack:///./store/index.js?'
         );
 
         /***/
@@ -848,11 +1047,11 @@
       /*!*********************************!*\
   !*** ./store/mutation-types.js ***!
   \*********************************/
-      /*! exports provided: UPDATE_WINDOWS */
+      /*! exports provided: INC_WINDOW, REMOVE_WINDOW, INC_NEXT_WINDOW_INDEX, SET_NEXT_WINDOW_INDEX */
       /***/ function(module, __webpack_exports__, __webpack_require__) {
         'use strict';
         eval(
-          '__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UPDATE_WINDOWS", function() { return UPDATE_WINDOWS; });\nvar UPDATE_WINDOWS = \'UPDATE_WINDOWS\';\n\n//# sourceURL=webpack:///./store/mutation-types.js?'
+          '__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "INC_WINDOW", function() { return INC_WINDOW; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "REMOVE_WINDOW", function() { return REMOVE_WINDOW; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "INC_NEXT_WINDOW_INDEX", function() { return INC_NEXT_WINDOW_INDEX; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SET_NEXT_WINDOW_INDEX", function() { return SET_NEXT_WINDOW_INDEX; });\nvar INC_WINDOW = \'INC_WINDOW\';\nvar REMOVE_WINDOW = \'REMOVE_WINDOW\';\nvar INC_NEXT_WINDOW_INDEX = \'INC_NEXT_WINDOW_INDEX\';\nvar SET_NEXT_WINDOW_INDEX = \'SET_NEXT_WINDOW_INDEX\';\n\n//# sourceURL=webpack:///./store/mutation-types.js?'
         );
 
         /***/
@@ -866,7 +1065,7 @@
       /***/ function(module, __webpack_exports__, __webpack_require__) {
         'use strict';
         eval(
-          '__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.object.define-property */ "../node_modules/core-js/modules/es.object.define-property.js");\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _mutation_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mutation-types */ "./store/mutation-types.js");\n\n\nfunction _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\n\n\n/* harmony default export */ __webpack_exports__["default"] = (_defineProperty({}, _mutation_types__WEBPACK_IMPORTED_MODULE_1__["UPDATE_WINDOWS"], function (state, payload) {\n  state.windows = payload;\n}));\n\n//# sourceURL=webpack:///./store/mutations.js?'
+          '__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.array.filter */ "../node_modules/core-js/modules/es.array.filter.js");\n/* harmony import */ var core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.object.define-property */ "../node_modules/core-js/modules/es.object.define-property.js");\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _mutation_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./mutation-types */ "./store/mutation-types.js");\n\n\n\nvar _types$INC_WINDOW$typ;\n\nfunction _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\n\n\n/* harmony default export */ __webpack_exports__["default"] = (_types$INC_WINDOW$typ = {}, _defineProperty(_types$INC_WINDOW$typ, _mutation_types__WEBPACK_IMPORTED_MODULE_2__["INC_WINDOW"], function (state, window) {\n  state.windows.push(window);\n}), _defineProperty(_types$INC_WINDOW$typ, _mutation_types__WEBPACK_IMPORTED_MODULE_2__["INC_NEXT_WINDOW_INDEX"], function (state, type) {\n  if (state.layouts[type].cols * state.layouts[type].rows > state.layouts[type].nextIndex) {\n    state.layouts[type].nextIndex += 1;\n  } else {\n    state.layouts[type].nextIndex = 1;\n  }\n}), _defineProperty(_types$INC_WINDOW$typ, _mutation_types__WEBPACK_IMPORTED_MODULE_2__["SET_NEXT_WINDOW_INDEX"], function (state, _ref) {\n  var type = _ref.type,\n      index = _ref.index;\n  state.layouts[type].nextIndex = index;\n}), _defineProperty(_types$INC_WINDOW$typ, _mutation_types__WEBPACK_IMPORTED_MODULE_2__["REMOVE_WINDOW"], function (state, id) {\n  state.windows = state.windows.filter(function (window) {\n    return window.id !== id;\n  });\n}), _types$INC_WINDOW$typ);\n\n//# sourceURL=webpack:///./store/mutations.js?'
         );
 
         /***/

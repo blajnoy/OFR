@@ -21,6 +21,7 @@
         </a>
       </li>
     </ul>
+    <a href="#" @click="turnUpLastWindow" class="turn-up">Turn up</a>
     <Settings></Settings>
     <footer class="popup-footer">
       <a href="#" class="rate-us">Rate Us</a>
@@ -49,6 +50,9 @@ export default {
     createWindow(type) {
       const url = this.urls[type];
       chrome.runtime.sendMessage({ action: 'create-window', url });
+    },
+    turnUpLastWindow() {
+      chrome.runtime.sendMessage({ action: 'turn-up-window' });
     },
   },
 };

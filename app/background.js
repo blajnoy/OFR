@@ -4,56 +4,113 @@ class Bg {
   constructor() {
     //this.findAppTab();
     this.initListeners();
+    this.onWindowRemoved();
   }
 
   initListeners() {
     chrome.runtime.onMessage.addListener(msg => {
       if (msg.action === 'create-window') {
-        const width = 1000;
-        const height = 800;
-        let id;
+        const { currentLayout } = store.state;
+        const nextIndex = store.getters.nextIndex(currentLayout);
+        const { width, height } = this.getSizes(currentLayout);
+        const { top, left } = this.getPosition(currentLayout, nextIndex);
         chrome.windows.create(
           {
             type: 'popup',
             url: msg.url,
             width,
             height,
-            left: screen.width / 2 - width / 2,
+            top,
+            left,
           },
           window => {
-            id = window.id;
-            console.log(window);
+            const newWindow = {
+              id: window.id,
+              index: nextIndex,
+              type: currentLayout,
+            };
+            store.commit('INC_WINDOW', newWindow);
+            store.commit('INC_NEXT_WINDOW_INDEX', currentLayout);
           }
         );
+      }
+      if (msg.action === 'turn-up-window') {
+        if (store.getters.windows.length) {
+          store.getters.windows.forEach(turnWindow => {
+            window.chrome.windows.update(turnWindow.id, {
+              focused: true,
+              state: 'normal',
+            });
+          });
+        }
       }
     });
   }
 
-  findAppTab() {
-    chrome.tabs.query({ url: this.APP_URL, windowType: 'popup' }, tabs => {
-      if (tabs && tabs[0] && tabs[0].id && tabs[0].windowId) {
-        this.appTabId = tabs[0].id;
-        this.appWindowId = tabs[0].windowId;
-      }
-    });
+  getSizes(type) {
+    const sizes = {
+      width: 1000,
+      height: 800,
+    };
+    switch (type) {
+      case '1x1':
+        break;
+      case '1x2':
+        sizes.width = screen.width / 2;
+        sizes.height = screen.availHeight;
+        break;
+      case '2x1':
+        sizes.height = screen.availHeight / 2;
+        sizes.width = screen.width;
+        break;
+      case '2x2':
+        sizes.width = screen.width / 2;
+        sizes.height = screen.availHeight / 2;
+        break;
+      default:
+        break;
+    }
+    return sizes;
+  }
+
+  getPosition(type, index = 1) {
+    const pos = {};
+    switch (type) {
+      case '1x1':
+        pos.left = screen.width / 2 - this.getSizes(type).width / 2;
+        pos.top = screen.availHeight / 2 - this.getSizes(type).height / 2;
+        break;
+      case '1x2':
+        if (index === 2) {
+          pos.left = screen.width / 2;
+        }
+        break;
+      case '2x1':
+        if (index === 2) {
+          pos.top = screen.availHeight / 2;
+        }
+        break;
+      case '2x2':
+        if (index > 1) {
+          if (index % 2 === 0) {
+            pos.left = screen.width / 2;
+          }
+          if (index > 2) {
+            pos.top = screen.availHeight / 2;
+          }
+        }
+        break;
+      default:
+        break;
+    }
+    return pos;
   }
 
   onWindowRemoved() {
     chrome.windows.onRemoved.addListener(windowId => {
-      if (windowId === this.appWindowId) {
-        this.appTabId = null;
-        this.appWindowId = null;
-      }
-    });
-  }
-
-  onWindowFocusChanged() {
-    chrome.windows.onFocusChanged.addListener(windowId => {
-      chrome.storage.local.get({ windowPinned: false }, storage => {
-        if (storage.windowPinned && this.appWindowId && windowId !== this.appWindowId) {
-          chrome.windows.update(this.appWindowId, { focused: true });
-        }
-      });
+      const { index, type } = store.getters.windowById(windowId)[0];
+      store.commit('SET_NEXT_WINDOW_INDEX', { type, index });
+      store.commit('REMOVE_WINDOW', windowId);
     });
   }
 }
