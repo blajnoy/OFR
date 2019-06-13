@@ -3,6 +3,8 @@ import store from './store';
 class Bg {
   constructor() {
     //this.findAppTab();
+    this.popup;
+    this.tabId;
     this.initListeners();
     this.onWindowRemoved();
   }
@@ -23,26 +25,30 @@ class Bg {
             top,
             left,
           },
-          window => {
+          win => {
             const newWindow = {
-              id: window.id,
+              id: win.id,
               index: nextIndex,
               type: currentLayout,
             };
             store.commit('INC_WINDOW', newWindow);
             store.commit('INC_NEXT_WINDOW_INDEX', currentLayout);
+            chrome.runtime.sendMessage(chrome.runtime.id, { action: 'window_created' });
           }
         );
       }
       if (msg.action === 'turn-up-window') {
         if (store.getters.windows.length) {
           store.getters.windows.forEach(turnWindow => {
-            window.chrome.windows.update(turnWindow.id, {
+            chrome.windows.update(turnWindow.id, {
               focused: true,
               state: 'normal',
             });
           });
         }
+      }
+      if (msg.action === 'init-popup') {
+        this.tabId = msg.tabId;
       }
     });
   }

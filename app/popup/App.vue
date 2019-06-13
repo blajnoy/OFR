@@ -46,6 +46,16 @@ export default {
       },
     };
   },
+  mounted() {
+    this.getCurrentTab(tab => {
+      chrome.runtime.sendMessage({ action: 'init-popup', tabId: tab.id });
+    });
+    chrome.extension.onMessage.addListener(msg => {
+      if (msg.action === 'window_created') {
+        window.focus();
+      }
+    });
+  },
   methods: {
     createWindow(type) {
       const url = this.urls[type];
@@ -53,6 +63,17 @@ export default {
     },
     turnUpLastWindow() {
       chrome.runtime.sendMessage({ action: 'turn-up-window' });
+    },
+    getCurrentTab(callback) {
+      chrome.tabs.query(
+        {
+          active: true,
+          currentWindow: true,
+        },
+        tabs => {
+          callback(tabs[0]);
+        }
+      );
     },
   },
 };
