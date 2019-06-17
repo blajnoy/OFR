@@ -2,7 +2,7 @@ import store from './store';
 
 class Bg {
   constructor() {
-    //this.findAppTab();
+    // this.findAppTab();
     this.popup;
     this.tabId;
     this.initListeners();
@@ -80,7 +80,10 @@ class Bg {
   }
 
   getPosition(type, index = 1) {
-    const pos = {};
+    const pos = {
+      top: 0,
+      left: 0,
+    };
     switch (type) {
       case '1x1':
         pos.left = screen.width / 2 - this.getSizes(type).width / 2;

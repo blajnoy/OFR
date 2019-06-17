@@ -31,11 +31,11 @@ export default {
   border: 2px solid #000;
   width: 100px;
   height: 100px;
-  display: flex;
   margin: 10px;
+  display: grid;
+  grid-template-columns: 50% 50%;
 
   .cell {
-    flex: 25%;
     border: 2px solid red;
   }
 }
