@@ -21,7 +21,10 @@
         </a>
       </li>
     </ul>
-    <a href="#" @click="turnUpLastWindow" class="turn-up">Turn up</a>
+    <div class="extra-nav">
+      <a href="#" @click="turnUpLastWindow" class="turn-up">Turn up</a>
+      <a href="#" @click="pinLastWindow" class="pin">Pin</a>
+    </div>
     <Settings></Settings>
     <footer class="popup-footer">
       <a href="#" class="rate-us">Rate Us</a>
@@ -132,7 +135,12 @@ export default {
     }
   }
 }
-.turn-up {
-  margin: 0 0 0 10px;
+.extra-nav {
+  display: flex;
+  padding: 10px;
+
+  .pin {
+    margin-left: auto;
+  }
 }
 </style>

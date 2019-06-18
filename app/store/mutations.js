@@ -4,6 +4,9 @@ export default {
   [types.INC_WINDOW](state, window) {
     state.windows.push(window);
   },
+  [types.SET_CURRENT_LAYOUT](state, layout) {
+    state.currentLayout = layout;
+  },
   [types.INC_NEXT_WINDOW_INDEX](state, type) {
     if (state.layouts[type].cols * state.layouts[type].rows > state.layouts[type].nextIndex) {
       state.layouts[type].nextIndex += 1;

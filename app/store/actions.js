@@ -8,6 +8,10 @@ export const removeWindow = ({ commit }, id) => {
   commit(types.REMOVE_WINDOW, id);
 };
 
+export const setCurrentLayout = ({ commit }, layout) => {
+  commit(types.SET_CURRENT_LAYOUT, layout);
+};
+
 export const incNextWindowIndex = ({ commit }, type) => {
   commit(types.INC_NEXT_WINDOW_INDEX, type);
 };

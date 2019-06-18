@@ -3,8 +3,11 @@ import store from './store';
 class Bg {
   constructor() {
     // this.findAppTab();
+    this.appWindowId;
+    this.appTabId;
     this.popup;
     this.tabId;
+    //this.onIconClicked();
     this.initListeners();
     this.onWindowRemoved();
   }
@@ -49,6 +52,30 @@ class Bg {
       }
       if (msg.action === 'init-popup') {
         this.tabId = msg.tabId;
+      }
+      if (msg.action === 'update-current-layout') {
+        const { currentLayout } = store.state;
+        const { width, height } = this.getSizes(currentLayout);
+        let nextIndex = 0;
+        if (store.getters.windows.length) {
+          store.getters.windows.forEach(updatingWindow => {
+            if (!nextIndex) {
+              store.commit('SET_NEXT_WINDOW_INDEX', { type: currentLayout, index: 1 });
+            } else {
+              store.commit('INC_NEXT_WINDOW_INDEX', currentLayout);
+            }
+            nextIndex = store.getters.nextIndex(currentLayout);
+            const { top, left } = this.getPosition(currentLayout, nextIndex);
+            chrome.windows.update(updatingWindow.id, {
+              // focused: true,
+              // state: 'normal',
+              width,
+              height,
+              top,
+              left,
+            });
+          });
+        }
       }
     });
   }
@@ -120,6 +147,29 @@ class Bg {
       const { index, type } = store.getters.windowById(windowId)[0];
       store.commit('SET_NEXT_WINDOW_INDEX', { type, index });
       store.commit('REMOVE_WINDOW', windowId);
+    });
+  }
+
+  onIconClicked() {
+    chrome.browserAction.onClicked.addListener(() => {
+      if (this.appWindowId) {
+        chrome.windows.update(this.appWindowId, { focused: true });
+      } else {
+        const width = 540;
+        chrome.windows.create(
+          {
+            type: 'popup',
+            url: chrome.extension.getURL('popup/popup.html'),
+            width,
+            left: screen.width - width,
+            top: 65,
+          },
+          window => {
+            this.appWindowId = window.id;
+            this.appTabId = window.tabs[0].id;
+          }
+        );
+      }
     });
   }
 }

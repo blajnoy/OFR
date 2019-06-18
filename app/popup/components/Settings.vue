@@ -10,10 +10,10 @@
     </div>
     <div v-show="isVisible" class="settings-wrapper">
       <div class="layouts-list">
-        <LayoutItem :sizes="layouts['1x1']" />
-        <LayoutItem :sizes="layouts['1x2']" />
-        <LayoutItem :sizes="layouts['2x1']" />
-        <LayoutItem :sizes="layouts['2x2']" />
+        <LayoutItem :size="'1x1'" v-bind:class="{ item1x1: true }" />
+        <LayoutItem :size="'1x2'" v-bind:class="{ item1x2: true }" />
+        <LayoutItem :size="'2x1'" v-bind:class="{ item2x1: true }" />
+        <LayoutItem :size="'2x2'" v-bind:class="{ item2x2: true }" />
       </div>
     </div>
   </div>
@@ -30,24 +30,6 @@ export default {
   data() {
     return {
       show: false,
-      layouts: {
-        '1x1': {
-          cols: 1,
-          rows: 1,
-        },
-        '2x1': {
-          cols: 2,
-          rows: 1,
-        },
-        '1x2': {
-          cols: 1,
-          rows: 2,
-        },
-        '2x2': {
-          cols: 2,
-          rows: 2,
-        },
-      },
     };
   },
   computed: {
