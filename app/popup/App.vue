@@ -23,12 +23,12 @@
     </ul>
     <div class="extra-nav">
       <a href="#" @click="turnUpLastWindow" class="turn-up">Turn up</a>
-      <a href="#" @click="pinLastWindow" class="pin">Pin</a>
+      <a href="#" @click="togglePinLastWindow" class="pin">Pin</a>
     </div>
     <Settings></Settings>
     <footer class="popup-footer">
       <a href="#" class="rate-us">Rate Us</a>
-      <a href="#" class="contact-us">Contact Us</a>
+      <a href="mailto:blajnoy@gmail.com" class="contact-us">Contact Us</a>
     </footer>
   </div>
 </template>
@@ -49,16 +49,7 @@ export default {
       },
     };
   },
-  mounted() {
-    this.getCurrentTab(tab => {
-      chrome.runtime.sendMessage({ action: 'init-popup', tabId: tab.id });
-    });
-    chrome.extension.onMessage.addListener(msg => {
-      if (msg.action === 'window_created') {
-        window.focus();
-      }
-    });
-  },
+  mounted() {},
   methods: {
     createWindow(type) {
       const url = this.urls[type];
@@ -67,16 +58,8 @@ export default {
     turnUpLastWindow() {
       chrome.runtime.sendMessage({ action: 'turn-up-window' });
     },
-    getCurrentTab(callback) {
-      chrome.tabs.query(
-        {
-          active: true,
-          currentWindow: true,
-        },
-        tabs => {
-          callback(tabs[0]);
-        }
-      );
+    togglePinLastWindow() {
+      chrome.runtime.sendMessage({ action: 'toggle-pin-last-window' });
     },
   },
 };

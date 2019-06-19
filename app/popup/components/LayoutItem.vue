@@ -36,7 +36,7 @@ export default {
 
 <style lang="scss" scoped>
 .layout-item {
-  border: 2px solid #000;
+  border: 2px solid #ccc;
   width: 100px;
   height: 100px;
   margin: 10px;
@@ -55,7 +55,7 @@ export default {
     grid-template-columns: 50% 50%;
   }
   &.active {
-    border-color: red;
+    border-color: #000;
   }
   .cell {
     border: 2px solid #ccc;
