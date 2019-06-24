@@ -38,6 +38,10 @@ export default new Vuex.Store({
         active: false,
       },
     },
+    pinned: {
+      active: false,
+      id: null,
+    },
   },
   getters,
   mutations,

@@ -1,7 +1,7 @@
 {
   "name": "office_file_redactor",
   "version": "1.0.0",
-  "description": "A Vue.js web extension",
+  "description": "office_file_redactor",
   "author": "alexey.nik <blajnoy@gmail.com>",
   "scripts": {
     "lint": "eslint --ext .js,.vue app",
@@ -14,6 +14,7 @@
     "watch:dev": "cross-env HMR=true npm run build:dev -- --watch"
   },
   "dependencies": {
+    "axios": "^0.19.0",
     "vue": "^2.6.10",
     "vuex": "^3.0.1",
     "vuex-webextensions": "^1.2.7"

@@ -56,6 +56,114 @@
   margin: -10px;
 }
 
+*[data-v-093ffbbc],
+*[data-v-093ffbbc]::after,
+*[data-v-093ffbbc]::before {
+  box-sizing: border-box;
+}
+.contact-form[data-v-093ffbbc] {
+  font-size: 16px;
+  padding: 10px 0 5px;
+}
+.contact-form input[type='text'][data-v-093ffbbc],
+.contact-form input[type='email'][data-v-093ffbbc],
+.contact-form textarea[data-v-093ffbbc] {
+  display: block;
+  width: calc(100% - 10px);
+  margin: 0 5px;
+  appearance: none;
+  color: #2b3e51;
+  padding: 10px;
+  border: 1px solid #cfd9db;
+  background-color: #ffffff;
+  border-radius: 0.25em;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.08);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.contact-form input[type='text'][data-v-093ffbbc]:focus,
+.contact-form input[type='email'][data-v-093ffbbc]:focus,
+.contact-form textarea[data-v-093ffbbc]:focus {
+  outline: none;
+  border-color: #2c3e50;
+  box-shadow: 0 0 5px rgba(44, 151, 222, 0.2);
+}
+.contact-form textarea[data-v-093ffbbc] {
+  min-height: 100px;
+  resize: vertical;
+  overflow: auto;
+}
+.contact-form input[type='submit'][data-v-093ffbbc] {
+  border: none;
+  background: #2c3e50;
+  border-radius: 0.25em;
+  padding: 10px 20px;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  appearance: none;
+}
+.contact-form input[type='submit'][data-v-093ffbbc]:hover {
+  background: #42a2e1;
+}
+.contact-form input[type='submit'][data-v-093ffbbc]:focus {
+  outline: none;
+  background: #2b3e51;
+}
+.contact-form input[type='submit'][data-v-093ffbbc]:disabled {
+  background: #5d7e78 !important;
+  cursor: default !important;
+}
+.contact-form input[type='submit'][data-v-093ffbbc]:active {
+  transform: scale(0.9);
+}
+.contact-form .row[data-v-093ffbbc] {
+  padding: 0 0 10px;
+  margin: 0 -5px;
+  display: flex;
+  position: relative;
+}
+.contact-form .row input[data-v-093ffbbc] {
+  margin: 0 5px;
+}
+.contact-form .btn-row[data-v-093ffbbc] {
+  display: flex;
+}
+.contact-form .btn-row input[type='submit'][data-v-093ffbbc] {
+  margin: 0 0 0 auto;
+}
+.contact-form .error-message[data-v-093ffbbc] {
+  height: 35px;
+  margin: 0px;
+}
+.contact-form .error-message p[data-v-093ffbbc] {
+  background: #e94b35;
+  color: #ffffff;
+  font-size: 1.4rem;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  border-radius: 0.25em;
+  padding: 16px;
+}
+.contact-form .error[data-v-093ffbbc] {
+  border-color: #e94b35 !important;
+}
+.contact-form .counter[data-v-093ffbbc] {
+  background-color: #ecf0f1;
+  position: absolute;
+  right: 6px;
+  top: 1px;
+  font-size: 10px;
+  padding: 1px 3px;
+  color: #666;
+  border-radius: 0.25em;
+}
+.contact-form .textarea-wrap[data-v-093ffbbc] {
+  position: relative;
+}
+
 .popup-holder[data-v-126fbd00] {
   font-size: 14px;
   line-height: normal;
@@ -69,13 +177,33 @@
   text-decoration: underline;
 }
 .popup-holder .popup-footer[data-v-126fbd00] {
-  display: flex;
-  align-items: center;
   padding: 5px 10px;
   border-top: 1px solid #f5f5f5;
 }
-.popup-holder .popup-footer .contact-us[data-v-126fbd00] {
-  margin-left: auto;
+.popup-holder .popup-footer .footer-row[data-v-126fbd00] {
+  display: flex;
+  align-items: center;
+}
+.popup-holder .popup-footer .footer-row .contact-us[data-v-126fbd00] {
+  font-size: 14px;
+  line-height: normal;
+  display: inline-block;
+  cursor: pointer;
+  margin: 0 0 0 auto;
+}
+.popup-holder .popup-footer .footer-row .contact-us[data-v-126fbd00]:hover {
+  text-decoration: none;
+}
+.popup-holder .popup-footer .footer-row .contact-us svg[data-v-126fbd00] {
+  display: inline-block;
+  vertical-align: middle;
+  width: 14px;
+  height: auto;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.popup-holder .popup-footer .footer-row .contact-us.up svg[data-v-126fbd00] {
+  transform: rotate(180deg);
 }
 .ttl[data-v-126fbd00] {
   font-size: 18px;
@@ -111,4 +239,14 @@
 }
 .extra-nav .pin[data-v-126fbd00] {
   margin-left: auto;
+}
+.extra-nav .pin.disabled[data-v-126fbd00] {
+  cursor: default;
+  pointer-events: none;
+  color: #666666;
+}
+.rate-us img[data-v-126fbd00] {
+  width: 90px;
+  height: auto;
+  vertical-align: middle;
 }

@@ -3,3 +3,5 @@ export const REMOVE_WINDOW = 'REMOVE_WINDOW';
 export const INC_NEXT_WINDOW_INDEX = 'INC_NEXT_WINDOW_INDEX';
 export const SET_NEXT_WINDOW_INDEX = 'SET_NEXT_WINDOW_INDEX';
 export const SET_CURRENT_LAYOUT = 'SET_CURRENT_LAYOUT';
+export const PIN = 'PIN';
+export const UNPIN = 'UNPIN';

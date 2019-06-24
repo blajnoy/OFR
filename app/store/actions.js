@@ -19,3 +19,11 @@ export const incNextWindowIndex = ({ commit }, type) => {
 export const setNextWindowIndex = ({ commit }, type, index) => {
   commit(types.SET_NEXT_WINDOW_INDEX, { type, index });
 };
+
+export const pin = ({ commit }, id, status) => {
+  commit(types.PIN, { id, status });
+};
+
+export const unpin = ({ commit }) => {
+  commit(types.UNPIN);
+};

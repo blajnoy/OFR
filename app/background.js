@@ -2,10 +2,6 @@ import store from './store';
 
 class Bg {
   constructor() {
-    this.pinned = {
-      active: false,
-      id: null,
-    };
     this.initListeners();
     this.onWindowRemoved();
   }
@@ -51,13 +47,21 @@ class Bg {
         }
       }
       if (msg.action === 'toggle-pin-last-window') {
-        if (!this.pinned.active) {
-          chrome.windows.getLastFocused({ populate: true }, win => {
-            this.pinned.id = win.id;
-            this.pinned.active = true;
+        if (!store.getters.pinned.active) {
+          const { width, height } = this.getSizes('2x2');
+          chrome.windows.getLastFocused({ windowTypes: ['popup'] }, win => {
+            store.commit('PIN', { id: win.id, status: true });
+            chrome.windows.update(store.getters.pinned.id, {
+              focused: true,
+              state: 'normal',
+              width,
+              height,
+              top: 0,
+              left: 0,
+            });
           });
         } else {
-          this.pinned.active = false;
+          store.commit('UNPIN');
         }
       }
       if (msg.action === 'update-current-layout') {
@@ -86,8 +90,8 @@ class Bg {
       }
     });
     chrome.windows.onFocusChanged.addListener(curId => {
-      if (this.pinned.active && this.pinned.id !== curId) {
-        chrome.windows.update(this.pinned.id, {
+      if (store.getters.pinned.active && store.getters.pinned.id !== curId) {
+        chrome.windows.update(store.getters.pinned.id, {
           focused: true,
         });
       }
@@ -161,6 +165,10 @@ class Bg {
       const { index, type } = store.getters.windowById(windowId)[0];
       store.commit('SET_NEXT_WINDOW_INDEX', { type, index });
       store.commit('REMOVE_WINDOW', windowId);
+
+      if (windowId === store.getters.pinned.id) {
+        store.commit('UNPIN');
+      }
     });
   }
 }

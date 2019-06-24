@@ -20,4 +20,11 @@ export default {
   [types.REMOVE_WINDOW](state, id) {
     state.windows = state.windows.filter(window => window.id !== id);
   },
+  [types.PIN](state, { id, status }) {
+    state.pinned.id = id;
+    state.pinned.active = status;
+  },
+  [types.UNPIN](state) {
+    state.pinned.active = false;
+  },
 };
