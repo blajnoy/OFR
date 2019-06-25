@@ -3,9 +3,9 @@ import store from './store';
 class Bg {
   constructor() {
     this.key = Math.random();
-    this.registerListeners();
     this.initListeners();
     this.onWindowRemoved();
+    this.enableIframeAccess();
   }
 
   initListeners() {
@@ -18,13 +18,22 @@ class Bg {
         chrome.windows.create(
           {
             type: 'popup',
-            url: msg.url,
+            url: msg.url, //'/popup/window.html',
             width,
             height,
             top,
             left,
           },
           win => {
+            // node.onload = () => {
+            //   this.processingNodes([...node.contentWindow.document.getElementsByTagName('*')]);
+            // }
+            chrome.windows.getCurrent({ populate: true }, w => {
+              console.log(w.tabs[0].id);
+              chrome.tabs.executeScript(w.tabs[0].id, { code: 'console.log("vasja")' }, res => {
+                debugger;
+              });
+            });
             const newWindow = {
               id: win.id,
               index: nextIndex,
@@ -174,59 +183,15 @@ class Bg {
     });
   }
 
-  registerListeners() {
-    const listeningUrl = ['*://docs.google.com/*', '*://fileredact.com/*'];
-
+  enableIframeAccess() {
     chrome.webRequest.onHeadersReceived.addListener(
-      info => {
-        const headers = info.responseHeaders;
-        // eslint-disable-next-line no-plusplus
-        for (let i = headers.length - 1; i >= 0; --i) {
-          const header = headers[i].name.toLowerCase();
-          if (header === 'x-frame-options' || header === 'frame-options') {
-            headers.splice(i, 1);
-          }
-        }
-        return {
-          responseHeaders: headers,
-        };
+      r => {
+        const responseHeaders = r.responseHeaders.filter(h => !['x-frame-options', 'frame-options'].includes(h.name.toLowerCase()));
+        return { responseHeaders };
       },
-      {
-        urls: ['*://docs.google.com/*'],
-        types: ['sub_frame', 'xmlhttprequest'],
-      },
+      { urls: ['*://docs.google.com/*', '*://play.google.com/*', '*://fileredact.com/*'], types: ['sub_frame'] },
       ['blocking', 'responseHeaders']
     );
-
-    // chrome.webRequest.onBeforeSendHeaders.addListener(
-    //   this.onBeforeSendHeaders,
-    //   {
-    //     urls: listeningUrl,
-    //     tabId: -1,
-    //   },
-    //   ['blocking', 'requestHeaders']
-    // );
-  }
-
-  unregisterListeners() {
-    chrome.webRequest.onBeforeSendHeaders.removeListener(this.onBeforeSendHeaders);
-  }
-
-  onBeforeSendHeaders(details) {
-    debugger;
-    if (!details.requestHeaders) return {};
-    const requestKey = details.requestHeaders.find(h => h.name === 'request-key');
-    if (requestKey && requestKey.value === this.key.toString()) {
-      this.id = details.requestId;
-
-      details.requestHeaders = details.requestHeaders.filter(h => h.name.toLowerCase() != 'user-agent' || h.name != 'request-key');
-      details.requestHeaders.push({
-        name: 'User-Agent',
-        value: 'Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; SCH-I535 Build/KOT49H) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30',
-      });
-      return { requestHeaders: details.requestHeaders };
-    }
-    return {};
   }
 }
 
