@@ -2,6 +2,8 @@ import store from './store';
 
 class Bg {
   constructor() {
+    this.key = Math.random();
+    this.registerListeners();
     this.initListeners();
     this.onWindowRemoved();
   }
@@ -170,6 +172,61 @@ class Bg {
         store.commit('UNPIN');
       }
     });
+  }
+
+  registerListeners() {
+    const listeningUrl = ['*://docs.google.com/*', '*://fileredact.com/*'];
+
+    chrome.webRequest.onHeadersReceived.addListener(
+      info => {
+        const headers = info.responseHeaders;
+        // eslint-disable-next-line no-plusplus
+        for (let i = headers.length - 1; i >= 0; --i) {
+          const header = headers[i].name.toLowerCase();
+          if (header === 'x-frame-options' || header === 'frame-options') {
+            headers.splice(i, 1);
+          }
+        }
+        return {
+          responseHeaders: headers,
+        };
+      },
+      {
+        urls: ['*://docs.google.com/*'],
+        types: ['sub_frame', 'xmlhttprequest'],
+      },
+      ['blocking', 'responseHeaders']
+    );
+
+    // chrome.webRequest.onBeforeSendHeaders.addListener(
+    //   this.onBeforeSendHeaders,
+    //   {
+    //     urls: listeningUrl,
+    //     tabId: -1,
+    //   },
+    //   ['blocking', 'requestHeaders']
+    // );
+  }
+
+  unregisterListeners() {
+    chrome.webRequest.onBeforeSendHeaders.removeListener(this.onBeforeSendHeaders);
+  }
+
+  onBeforeSendHeaders(details) {
+    debugger;
+    if (!details.requestHeaders) return {};
+    const requestKey = details.requestHeaders.find(h => h.name === 'request-key');
+    if (requestKey && requestKey.value === this.key.toString()) {
+      this.id = details.requestId;
+
+      details.requestHeaders = details.requestHeaders.filter(h => h.name.toLowerCase() != 'user-agent' || h.name != 'request-key');
+      details.requestHeaders.push({
+        name: 'User-Agent',
+        value: 'Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; SCH-I535 Build/KOT49H) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30',
+      });
+      return { requestHeaders: details.requestHeaders };
+    }
+    return {};
   }
 }
 

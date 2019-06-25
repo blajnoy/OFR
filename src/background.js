@@ -1,4 +1,104 @@
-/******/ (function(modules) {
+/* -------------------------------------------------- */
+/*  Start of Webpack Chrome Hot Extension Middleware  */
+/* ================================================== */
+/*  This will be converted into a lodash templ., any  */
+/*  external argument must be provided using it       */
+/* -------------------------------------------------- */
+(function(chrome, window) {
+  var signals = JSON.parse('{"SIGN_CHANGE":"SIGN_CHANGE","SIGN_RELOAD":"SIGN_RELOAD","SIGN_RELOADED":"SIGN_RELOADED","SIGN_LOG":"SIGN_LOG","SIGN_CONNECT":"SIGN_CONNECT"}');
+  var config = JSON.parse('{"RECONNECT_INTERVAL":2000,"SOCKET_ERR_CODE_REF":"https://tools.ietf.org/html/rfc6455#section-7.4.1"}');
+  var reloadPage = 'true' === 'true';
+  var wsHost = 'ws://localhost:9090';
+  var SIGN_CHANGE = signals.SIGN_CHANGE,
+    SIGN_RELOAD = signals.SIGN_RELOAD,
+    SIGN_RELOADED = signals.SIGN_RELOADED,
+    SIGN_LOG = signals.SIGN_LOG,
+    SIGN_CONNECT = signals.SIGN_CONNECT;
+  var RECONNECT_INTERVAL = config.RECONNECT_INTERVAL,
+    SOCKET_ERR_CODE_REF = config.SOCKET_ERR_CODE_REF;
+  var runtime = chrome.runtime,
+    tabs = chrome.tabs;
+
+  var manifest = runtime.getManifest();
+  var formatter = function formatter(msg) {
+    return '[ WCER: ' + msg + ' ]';
+  };
+  var logger = function logger(msg) {
+    var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'info';
+    return console[level](formatter(msg));
+  };
+  var timeFormatter = function timeFormatter(date) {
+    return date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, '$1');
+  };
+  function contentScriptWorker() {
+    runtime.sendMessage({ type: SIGN_CONNECT }, function(msg) {
+      return console.info(msg);
+    });
+    runtime.onMessage.addListener(function(_ref) {
+      var type = _ref.type,
+        payload = _ref.payload;
+
+      switch (type) {
+        case SIGN_RELOAD:
+          logger('Detected Changes. Reloading ...');
+          reloadPage && window.location.reload();
+          break;
+        case SIGN_LOG:
+          console.info(payload);
+          break;
+      }
+    });
+  }
+  function backgroundWorker(socket) {
+    runtime.onMessage.addListener(function(action, sender, sendResponse) {
+      if (action.type === SIGN_CONNECT) {
+        sendResponse(formatter('Connected to Chrome Extension Hot Reloader'));
+      }
+    });
+    socket.addEventListener('message', function(_ref2) {
+      var data = _ref2.data;
+
+      var _JSON$parse = JSON.parse(data),
+        type = _JSON$parse.type,
+        payload = _JSON$parse.payload;
+
+      if (type === SIGN_CHANGE) {
+        tabs.query({ status: 'complete' }, function(loadedTabs) {
+          loadedTabs.forEach(function(tab) {
+            return tabs.sendMessage(tab.id, { type: SIGN_RELOAD });
+          });
+          socket.send(
+            JSON.stringify({
+              type: SIGN_RELOADED,
+              payload: formatter(timeFormatter(new Date()) + ' - ' + manifest.name + ' successfully reloaded'),
+            })
+          );
+          runtime.reload();
+        });
+      } else {
+        runtime.sendMessage({ type: type, payload: payload });
+      }
+    });
+    socket.addEventListener('close', function(_ref3) {
+      var code = _ref3.code;
+
+      logger('Socket connection closed. Code ' + code + '. See more in ' + SOCKET_ERR_CODE_REF, 'warn');
+      var intId = setInterval(function() {
+        logger('WEPR Attempting to reconnect ...');
+        var ws = new WebSocket(wsHost);
+        ws.addEventListener('open', function() {
+          clearInterval(intId);
+          logger('Reconnected. Reloading plugin');
+          runtime.reload();
+        });
+      }, RECONNECT_INTERVAL);
+    });
+  }
+  runtime.reload ? backgroundWorker(new WebSocket(wsHost)) : contentScriptWorker();
+})(chrome, window);
+/* ----------------------------------------------- */
+/* End of Webpack Chrome Hot Extension Middleware  */
+/* ----------------------------------------------- */ /******/ (function(modules) {
   // webpackBootstrap
   /******/ // The module cache
   /******/ var installedModules = {}; // The require function
@@ -101,6 +201,19 @@
       /***/ function(module, exports) {
         eval(
           "module.exports = function (it) {\n  if (typeof it != 'function') {\n    throw TypeError(String(it) + ' is not a function');\n  } return it;\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/a-function.js?"
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/add-to-unscopables.js':
+      /*!***************************************************************!*\
+  !*** ../node_modules/core-js/internals/add-to-unscopables.js ***!
+  \***************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "../node_modules/core-js/internals/well-known-symbol.js");\nvar create = __webpack_require__(/*! ../internals/object-create */ "../node_modules/core-js/internals/object-create.js");\nvar hide = __webpack_require__(/*! ../internals/hide */ "../node_modules/core-js/internals/hide.js");\n\nvar UNSCOPABLES = wellKnownSymbol(\'unscopables\');\nvar ArrayPrototype = Array.prototype;\n\n// Array.prototype[@@unscopables]\n// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables\nif (ArrayPrototype[UNSCOPABLES] == undefined) {\n  hide(ArrayPrototype, UNSCOPABLES, create(null));\n}\n\n// add a key to Array.prototype[@@unscopables]\nmodule.exports = function (key) {\n  ArrayPrototype[UNSCOPABLES][key] = true;\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/add-to-unscopables.js?'
         );
 
         /***/
@@ -211,6 +324,19 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/classof.js':
+      /*!****************************************************!*\
+  !*** ../node_modules/core-js/internals/classof.js ***!
+  \****************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          "var classofRaw = __webpack_require__(/*! ../internals/classof-raw */ \"../node_modules/core-js/internals/classof-raw.js\");\nvar wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ \"../node_modules/core-js/internals/well-known-symbol.js\");\n\nvar TO_STRING_TAG = wellKnownSymbol('toStringTag');\n// ES3 wrong here\nvar CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) == 'Arguments';\n\n// fallback for IE11 Script Access Denied error\nvar tryGet = function (it, key) {\n  try {\n    return it[key];\n  } catch (error) { /* empty */ }\n};\n\n// getting tag from ES6+ `Object.prototype.toString`\nmodule.exports = function (it) {\n  var O, tag, result;\n  return it === undefined ? 'Undefined' : it === null ? 'Null'\n    // @@toStringTag case\n    : typeof (tag = tryGet(O = Object(it), TO_STRING_TAG)) == 'string' ? tag\n    // builtinTag case\n    : CORRECT_ARGUMENTS ? classofRaw(O)\n    // ES3 arguments fallback\n    : (result = classofRaw(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : result;\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/classof.js?"
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/copy-constructor-properties.js':
       /*!************************************************************************!*\
   !*** ../node_modules/core-js/internals/copy-constructor-properties.js ***!
@@ -232,6 +358,20 @@
       /***/ function(module, exports) {
         eval(
           'module.exports = function (bitmap, value) {\n  return {\n    enumerable: !(bitmap & 1),\n    configurable: !(bitmap & 2),\n    writable: !(bitmap & 4),\n    value: value\n  };\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/create-property-descriptor.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/create-property.js':
+      /*!************************************************************!*\
+  !*** ../node_modules/core-js/internals/create-property.js ***!
+  \************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          '\nvar toPrimitive = __webpack_require__(/*! ../internals/to-primitive */ "../node_modules/core-js/internals/to-primitive.js");\nvar definePropertyModule = __webpack_require__(/*! ../internals/object-define-property */ "../node_modules/core-js/internals/object-define-property.js");\nvar createPropertyDescriptor = __webpack_require__(/*! ../internals/create-property-descriptor */ "../node_modules/core-js/internals/create-property-descriptor.js");\n\nmodule.exports = function (object, key, value) {\n  var propertyKey = toPrimitive(key);\n  if (propertyKey in object) definePropertyModule.f(object, propertyKey, createPropertyDescriptor(0, value));\n  else object[propertyKey] = value;\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/create-property.js?'
         );
 
         /***/
@@ -378,6 +518,19 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/html.js':
+      /*!*************************************************!*\
+  !*** ../node_modules/core-js/internals/html.js ***!
+  \*************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var global = __webpack_require__(/*! ../internals/global */ "../node_modules/core-js/internals/global.js");\n\nvar document = global.document;\n\nmodule.exports = document && document.documentElement;\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/html.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/ie8-dom-define.js':
       /*!***********************************************************!*\
   !*** ../node_modules/core-js/internals/ie8-dom-define.js ***!
@@ -493,6 +646,32 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/object-create.js':
+      /*!**********************************************************!*\
+  !*** ../node_modules/core-js/internals/object-create.js ***!
+  \**********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          "var anObject = __webpack_require__(/*! ../internals/an-object */ \"../node_modules/core-js/internals/an-object.js\");\nvar defineProperties = __webpack_require__(/*! ../internals/object-define-properties */ \"../node_modules/core-js/internals/object-define-properties.js\");\nvar enumBugKeys = __webpack_require__(/*! ../internals/enum-bug-keys */ \"../node_modules/core-js/internals/enum-bug-keys.js\");\nvar hiddenKeys = __webpack_require__(/*! ../internals/hidden-keys */ \"../node_modules/core-js/internals/hidden-keys.js\");\nvar html = __webpack_require__(/*! ../internals/html */ \"../node_modules/core-js/internals/html.js\");\nvar documentCreateElement = __webpack_require__(/*! ../internals/document-create-element */ \"../node_modules/core-js/internals/document-create-element.js\");\nvar sharedKey = __webpack_require__(/*! ../internals/shared-key */ \"../node_modules/core-js/internals/shared-key.js\");\nvar IE_PROTO = sharedKey('IE_PROTO');\n\nvar PROTOTYPE = 'prototype';\nvar Empty = function () { /* empty */ };\n\n// Create object with fake `null` prototype: use iframe Object with cleared prototype\nvar createDict = function () {\n  // Thrash, waste and sodomy: IE GC bug\n  var iframe = documentCreateElement('iframe');\n  var length = enumBugKeys.length;\n  var lt = '<';\n  var script = 'script';\n  var gt = '>';\n  var js = 'java' + script + ':';\n  var iframeDocument;\n  iframe.style.display = 'none';\n  html.appendChild(iframe);\n  iframe.src = String(js);\n  iframeDocument = iframe.contentWindow.document;\n  iframeDocument.open();\n  iframeDocument.write(lt + script + gt + 'document.F=Object' + lt + '/' + script + gt);\n  iframeDocument.close();\n  createDict = iframeDocument.F;\n  while (length--) delete createDict[PROTOTYPE][enumBugKeys[length]];\n  return createDict();\n};\n\n// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])\nmodule.exports = Object.create || function create(O, Properties) {\n  var result;\n  if (O !== null) {\n    Empty[PROTOTYPE] = anObject(O);\n    result = new Empty();\n    Empty[PROTOTYPE] = null;\n    // add \"__proto__\" for Object.getPrototypeOf polyfill\n    result[IE_PROTO] = O;\n  } else result = createDict();\n  return Properties === undefined ? result : defineProperties(result, Properties);\n};\n\nhiddenKeys[IE_PROTO] = true;\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/object-create.js?"
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/object-define-properties.js':
+      /*!*********************************************************************!*\
+  !*** ../node_modules/core-js/internals/object-define-properties.js ***!
+  \*********************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var DESCRIPTORS = __webpack_require__(/*! ../internals/descriptors */ "../node_modules/core-js/internals/descriptors.js");\nvar definePropertyModule = __webpack_require__(/*! ../internals/object-define-property */ "../node_modules/core-js/internals/object-define-property.js");\nvar anObject = __webpack_require__(/*! ../internals/an-object */ "../node_modules/core-js/internals/an-object.js");\nvar objectKeys = __webpack_require__(/*! ../internals/object-keys */ "../node_modules/core-js/internals/object-keys.js");\n\nmodule.exports = DESCRIPTORS ? Object.defineProperties : function defineProperties(O, Properties) {\n  anObject(O);\n  var keys = objectKeys(Properties);\n  var length = keys.length;\n  var i = 0;\n  var key;\n  while (length > i) definePropertyModule.f(O, key = keys[i++], Properties[key]);\n  return O;\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/object-define-properties.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/object-define-property.js':
       /*!*******************************************************************!*\
   !*** ../node_modules/core-js/internals/object-define-property.js ***!
@@ -556,6 +735,19 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/internals/object-keys.js':
+      /*!********************************************************!*\
+  !*** ../node_modules/core-js/internals/object-keys.js ***!
+  \********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var internalObjectKeys = __webpack_require__(/*! ../internals/object-keys-internal */ "../node_modules/core-js/internals/object-keys-internal.js");\nvar enumBugKeys = __webpack_require__(/*! ../internals/enum-bug-keys */ "../node_modules/core-js/internals/enum-bug-keys.js");\n\n// 19.1.2.14 / 15.2.3.14 Object.keys(O)\nmodule.exports = Object.keys || function keys(O) {\n  return internalObjectKeys(O, enumBugKeys);\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/object-keys.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/internals/object-property-is-enumerable.js':
       /*!**************************************************************************!*\
   !*** ../node_modules/core-js/internals/object-property-is-enumerable.js ***!
@@ -565,6 +757,20 @@
         'use strict';
         eval(
           '\nvar nativePropertyIsEnumerable = {}.propertyIsEnumerable;\nvar getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;\n\n// Nashorn ~ JDK8 bug\nvar NASHORN_BUG = getOwnPropertyDescriptor && !nativePropertyIsEnumerable.call({ 1: 2 }, 1);\n\nexports.f = NASHORN_BUG ? function propertyIsEnumerable(V) {\n  var descriptor = getOwnPropertyDescriptor(this, V);\n  return !!descriptor && descriptor.enumerable;\n} : nativePropertyIsEnumerable;\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/object-property-is-enumerable.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/object-to-string.js':
+      /*!*************************************************************!*\
+  !*** ../node_modules/core-js/internals/object-to-string.js ***!
+  \*************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          "\nvar classof = __webpack_require__(/*! ../internals/classof */ \"../node_modules/core-js/internals/classof.js\");\nvar wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ \"../node_modules/core-js/internals/well-known-symbol.js\");\n\nvar TO_STRING_TAG = wellKnownSymbol('toStringTag');\nvar test = {};\n\ntest[TO_STRING_TAG] = 'z';\n\n// `Object.prototype.toString` method implementation\n// https://tc39.github.io/ecma262/#sec-object.prototype.tostring\nmodule.exports = String(test) !== '[object z]' ? function toString() {\n  return '[object ' + classof(this) + ']';\n} : test.toString;\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/object-to-string.js?"
         );
 
         /***/
@@ -604,6 +810,20 @@
       /***/ function(module, exports, __webpack_require__) {
         eval(
           "var global = __webpack_require__(/*! ../internals/global */ \"../node_modules/core-js/internals/global.js\");\nvar shared = __webpack_require__(/*! ../internals/shared */ \"../node_modules/core-js/internals/shared.js\");\nvar hide = __webpack_require__(/*! ../internals/hide */ \"../node_modules/core-js/internals/hide.js\");\nvar has = __webpack_require__(/*! ../internals/has */ \"../node_modules/core-js/internals/has.js\");\nvar setGlobal = __webpack_require__(/*! ../internals/set-global */ \"../node_modules/core-js/internals/set-global.js\");\nvar nativeFunctionToString = __webpack_require__(/*! ../internals/function-to-string */ \"../node_modules/core-js/internals/function-to-string.js\");\nvar InternalStateModule = __webpack_require__(/*! ../internals/internal-state */ \"../node_modules/core-js/internals/internal-state.js\");\n\nvar getInternalState = InternalStateModule.get;\nvar enforceInternalState = InternalStateModule.enforce;\nvar TEMPLATE = String(nativeFunctionToString).split('toString');\n\nshared('inspectSource', function (it) {\n  return nativeFunctionToString.call(it);\n});\n\n(module.exports = function (O, key, value, options) {\n  var unsafe = options ? !!options.unsafe : false;\n  var simple = options ? !!options.enumerable : false;\n  var noTargetGet = options ? !!options.noTargetGet : false;\n  if (typeof value == 'function') {\n    if (typeof key == 'string' && !has(value, 'name')) hide(value, 'name', key);\n    enforceInternalState(value).source = TEMPLATE.join(typeof key == 'string' ? key : '');\n  }\n  if (O === global) {\n    if (simple) O[key] = value;\n    else setGlobal(key, value);\n    return;\n  } else if (!unsafe) {\n    delete O[key];\n  } else if (!noTargetGet && O[key]) {\n    simple = true;\n  }\n  if (simple) O[key] = value;\n  else hide(O, key, value);\n// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative\n})(Function.prototype, 'toString', function toString() {\n  return typeof this == 'function' && getInternalState(this).source || nativeFunctionToString.call(this);\n});\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/redefine.js?"
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/internals/regexp-flags.js':
+      /*!*********************************************************!*\
+  !*** ../node_modules/core-js/internals/regexp-flags.js ***!
+  \*********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          "\nvar anObject = __webpack_require__(/*! ../internals/an-object */ \"../node_modules/core-js/internals/an-object.js\");\n\n// `RegExp.prototype.flags` getter implementation\n// https://tc39.github.io/ecma262/#sec-get-regexp.prototype.flags\nmodule.exports = function () {\n  var that = anObject(this);\n  var result = '';\n  if (that.global) result += 'g';\n  if (that.ignoreCase) result += 'i';\n  if (that.multiline) result += 'm';\n  if (that.unicode) result += 'u';\n  if (that.sticky) result += 'y';\n  return result;\n};\n\n\n//# sourceURL=webpack:///../node_modules/core-js/internals/regexp-flags.js?"
         );
 
         /***/
@@ -819,6 +1039,20 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/modules/es.array.find.js':
+      /*!********************************************************!*\
+  !*** ../node_modules/core-js/modules/es.array.find.js ***!
+  \********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          '\nvar $ = __webpack_require__(/*! ../internals/export */ "../node_modules/core-js/internals/export.js");\nvar arrayMethods = __webpack_require__(/*! ../internals/array-methods */ "../node_modules/core-js/internals/array-methods.js");\nvar addToUnscopables = __webpack_require__(/*! ../internals/add-to-unscopables */ "../node_modules/core-js/internals/add-to-unscopables.js");\n\nvar internalFind = arrayMethods(5);\nvar FIND = \'find\';\nvar SKIPS_HOLES = true;\n\n// Shouldn\'t skip holes\nif (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });\n\n// `Array.prototype.find` method\n// https://tc39.github.io/ecma262/#sec-array.prototype.find\n$({ target: \'Array\', proto: true, forced: SKIPS_HOLES }, {\n  find: function find(callbackfn /* , that = undefined */) {\n    return internalFind(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);\n  }\n});\n\n// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables\naddToUnscopables(FIND);\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.array.find.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/modules/es.array.for-each.js':
       /*!************************************************************!*\
   !*** ../node_modules/core-js/modules/es.array.for-each.js ***!
@@ -828,6 +1062,46 @@
         'use strict';
         eval(
           '\nvar $ = __webpack_require__(/*! ../internals/export */ "../node_modules/core-js/internals/export.js");\nvar forEach = __webpack_require__(/*! ../internals/array-for-each */ "../node_modules/core-js/internals/array-for-each.js");\n\n// `Array.prototype.forEach` method\n// https://tc39.github.io/ecma262/#sec-array.prototype.foreach\n$({ target: \'Array\', proto: true, forced: [].forEach != forEach }, {\n  forEach: forEach\n});\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.array.for-each.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/modules/es.array.splice.js':
+      /*!**********************************************************!*\
+  !*** ../node_modules/core-js/modules/es.array.splice.js ***!
+  \**********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          '\nvar $ = __webpack_require__(/*! ../internals/export */ "../node_modules/core-js/internals/export.js");\nvar toAbsoluteIndex = __webpack_require__(/*! ../internals/to-absolute-index */ "../node_modules/core-js/internals/to-absolute-index.js");\nvar toInteger = __webpack_require__(/*! ../internals/to-integer */ "../node_modules/core-js/internals/to-integer.js");\nvar toLength = __webpack_require__(/*! ../internals/to-length */ "../node_modules/core-js/internals/to-length.js");\nvar toObject = __webpack_require__(/*! ../internals/to-object */ "../node_modules/core-js/internals/to-object.js");\nvar arraySpeciesCreate = __webpack_require__(/*! ../internals/array-species-create */ "../node_modules/core-js/internals/array-species-create.js");\nvar createProperty = __webpack_require__(/*! ../internals/create-property */ "../node_modules/core-js/internals/create-property.js");\nvar arrayMethodHasSpeciesSupport = __webpack_require__(/*! ../internals/array-method-has-species-support */ "../node_modules/core-js/internals/array-method-has-species-support.js");\n\nvar max = Math.max;\nvar min = Math.min;\nvar MAX_SAFE_INTEGER = 0x1FFFFFFFFFFFFF;\nvar MAXIMUM_ALLOWED_LENGTH_EXCEEDED = \'Maximum allowed length exceeded\';\n\nvar SPECIES_SUPPORT = arrayMethodHasSpeciesSupport(\'splice\');\n\n// `Array.prototype.splice` method\n// https://tc39.github.io/ecma262/#sec-array.prototype.splice\n// with adding support of @@species\n$({ target: \'Array\', proto: true, forced: !SPECIES_SUPPORT }, {\n  splice: function splice(start, deleteCount /* , ...items */) {\n    var O = toObject(this);\n    var len = toLength(O.length);\n    var actualStart = toAbsoluteIndex(start, len);\n    var argumentsLength = arguments.length;\n    var insertCount, actualDeleteCount, A, k, from, to;\n    if (argumentsLength === 0) {\n      insertCount = actualDeleteCount = 0;\n    } else if (argumentsLength === 1) {\n      insertCount = 0;\n      actualDeleteCount = len - actualStart;\n    } else {\n      insertCount = argumentsLength - 2;\n      actualDeleteCount = min(max(toInteger(deleteCount), 0), len - actualStart);\n    }\n    if (len + insertCount - actualDeleteCount > MAX_SAFE_INTEGER) {\n      throw TypeError(MAXIMUM_ALLOWED_LENGTH_EXCEEDED);\n    }\n    A = arraySpeciesCreate(O, actualDeleteCount);\n    for (k = 0; k < actualDeleteCount; k++) {\n      from = actualStart + k;\n      if (from in O) createProperty(A, k, O[from]);\n    }\n    A.length = actualDeleteCount;\n    if (insertCount < actualDeleteCount) {\n      for (k = actualStart; k < len - actualDeleteCount; k++) {\n        from = k + actualDeleteCount;\n        to = k + insertCount;\n        if (from in O) O[to] = O[from];\n        else delete O[to];\n      }\n      for (k = len; k > len - actualDeleteCount + insertCount; k--) delete O[k - 1];\n    } else if (insertCount > actualDeleteCount) {\n      for (k = len - actualDeleteCount; k > actualStart; k--) {\n        from = k + actualDeleteCount - 1;\n        to = k + insertCount - 1;\n        if (from in O) O[to] = O[from];\n        else delete O[to];\n      }\n    }\n    for (k = 0; k < insertCount; k++) {\n      O[k + actualStart] = arguments[k + 2];\n    }\n    O.length = len - actualDeleteCount + insertCount;\n    return A;\n  }\n});\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.array.splice.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/modules/es.date.to-string.js':
+      /*!************************************************************!*\
+  !*** ../node_modules/core-js/modules/es.date.to-string.js ***!
+  \************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          "var redefine = __webpack_require__(/*! ../internals/redefine */ \"../node_modules/core-js/internals/redefine.js\");\n\nvar DatePrototype = Date.prototype;\nvar INVALID_DATE = 'Invalid Date';\nvar TO_STRING = 'toString';\nvar nativeDateToString = DatePrototype[TO_STRING];\nvar getTime = DatePrototype.getTime;\n\n// `Date.prototype.toString` method\n// https://tc39.github.io/ecma262/#sec-date.prototype.tostring\nif (new Date(NaN) + '' != INVALID_DATE) {\n  redefine(DatePrototype, TO_STRING, function toString() {\n    var value = getTime.call(this);\n    // eslint-disable-next-line no-self-compare\n    return value === value ? nativeDateToString.call(this) : INVALID_DATE;\n  });\n}\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.date.to-string.js?"
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/modules/es.function.name.js':
+      /*!***********************************************************!*\
+  !*** ../node_modules/core-js/modules/es.function.name.js ***!
+  \***********************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var DESCRIPTORS = __webpack_require__(/*! ../internals/descriptors */ "../node_modules/core-js/internals/descriptors.js");\nvar defineProperty = __webpack_require__(/*! ../internals/object-define-property */ "../node_modules/core-js/internals/object-define-property.js").f;\n\nvar FunctionPrototype = Function.prototype;\nvar FunctionPrototypeToString = FunctionPrototype.toString;\nvar nameRE = /^\\s*function ([^ (]*)/;\nvar NAME = \'name\';\n\n// Function instances `.name` property\n// https://tc39.github.io/ecma262/#sec-function-instances-name\nif (DESCRIPTORS && !(NAME in FunctionPrototype)) {\n  defineProperty(FunctionPrototype, NAME, {\n    configurable: true,\n    get: function () {\n      try {\n        return FunctionPrototypeToString.call(this).match(nameRE)[1];\n      } catch (error) {\n        return \'\';\n      }\n    }\n  });\n}\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.function.name.js?'
         );
 
         /***/
@@ -846,6 +1120,19 @@
         /***/
       },
 
+    /***/ '../node_modules/core-js/modules/es.object.to-string.js':
+      /*!**************************************************************!*\
+  !*** ../node_modules/core-js/modules/es.object.to-string.js ***!
+  \**************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        eval(
+          'var redefine = __webpack_require__(/*! ../internals/redefine */ "../node_modules/core-js/internals/redefine.js");\nvar toString = __webpack_require__(/*! ../internals/object-to-string */ "../node_modules/core-js/internals/object-to-string.js");\n\nvar ObjectPrototype = Object.prototype;\n\n// `Object.prototype.toString` method\n// https://tc39.github.io/ecma262/#sec-object.prototype.tostring\nif (toString !== ObjectPrototype.toString) {\n  redefine(ObjectPrototype, \'toString\', toString, { unsafe: true });\n}\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.object.to-string.js?'
+        );
+
+        /***/
+      },
+
     /***/ '../node_modules/core-js/modules/es.parse-int.js':
       /*!*******************************************************!*\
   !*** ../node_modules/core-js/modules/es.parse-int.js ***!
@@ -854,6 +1141,20 @@
       /***/ function(module, exports, __webpack_require__) {
         eval(
           'var $ = __webpack_require__(/*! ../internals/export */ "../node_modules/core-js/internals/export.js");\nvar parseIntImplementation = __webpack_require__(/*! ../internals/parse-int */ "../node_modules/core-js/internals/parse-int.js");\n\n// `parseInt` method\n// https://tc39.github.io/ecma262/#sec-parseint-string-radix\n$({ global: true, forced: parseInt != parseIntImplementation }, {\n  parseInt: parseIntImplementation\n});\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.parse-int.js?'
+        );
+
+        /***/
+      },
+
+    /***/ '../node_modules/core-js/modules/es.regexp.to-string.js':
+      /*!**************************************************************!*\
+  !*** ../node_modules/core-js/modules/es.regexp.to-string.js ***!
+  \**************************************************************/
+      /*! no static exports found */
+      /***/ function(module, exports, __webpack_require__) {
+        'use strict';
+        eval(
+          "\nvar redefine = __webpack_require__(/*! ../internals/redefine */ \"../node_modules/core-js/internals/redefine.js\");\nvar anObject = __webpack_require__(/*! ../internals/an-object */ \"../node_modules/core-js/internals/an-object.js\");\nvar fails = __webpack_require__(/*! ../internals/fails */ \"../node_modules/core-js/internals/fails.js\");\nvar flags = __webpack_require__(/*! ../internals/regexp-flags */ \"../node_modules/core-js/internals/regexp-flags.js\");\n\nvar TO_STRING = 'toString';\nvar nativeToString = /./[TO_STRING];\nvar RegExpPrototype = RegExp.prototype;\n\nvar NOT_GENERIC = fails(function () { return nativeToString.call({ source: 'a', flags: 'b' }) != '/a/b'; });\n// FF44- RegExp#toString has a wrong name\nvar INCORRECT_NAME = nativeToString.name != TO_STRING;\n\n// `RegExp.prototype.toString` method\n// https://tc39.github.io/ecma262/#sec-regexp.prototype.tostring\nif (NOT_GENERIC || INCORRECT_NAME) {\n  redefine(RegExp.prototype, TO_STRING, function toString() {\n    var R = anObject(this);\n    var p = String(R.source);\n    var rf = R.flags;\n    var f = String(rf === undefined && R instanceof RegExp && !('flags' in RegExpPrototype) ? flags.call(R) : rf);\n    return '/' + p + '/' + f;\n  }, { unsafe: true });\n}\n\n\n//# sourceURL=webpack:///../node_modules/core-js/modules/es.regexp.to-string.js?"
         );
 
         /***/
@@ -1017,7 +1318,7 @@
       /***/ function(module, __webpack_exports__, __webpack_require__) {
         'use strict';
         eval(
-          '__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.array.for-each */ "../node_modules/core-js/modules/es.array.for-each.js");\n/* harmony import */ var core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.object.define-property */ "../node_modules/core-js/modules/es.object.define-property.js");\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var core_js_modules_es_parse_int__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/es.parse-int */ "../node_modules/core-js/modules/es.parse-int.js");\n/* harmony import */ var core_js_modules_es_parse_int__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_parse_int__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "../node_modules/core-js/modules/web.dom-collections.for-each.js");\n/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./store */ "./store/index.js");\n\n\n\n\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\n\n\nvar Bg =\n/*#__PURE__*/\nfunction () {\n  function Bg() {\n    _classCallCheck(this, Bg);\n\n    this.initListeners();\n    this.onWindowRemoved();\n  }\n\n  _createClass(Bg, [{\n    key: "initListeners",\n    value: function initListeners() {\n      var _this = this;\n\n      chrome.runtime.onMessage.addListener(function (msg) {\n        if (msg.action === \'create-window\') {\n          var currentLayout = _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.currentLayout;\n          var nextIndex = _store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.nextIndex(currentLayout);\n\n          var _this$getSizes = _this.getSizes(currentLayout),\n              width = _this$getSizes.width,\n              height = _this$getSizes.height;\n\n          var _this$getPosition = _this.getPosition(currentLayout, nextIndex),\n              top = _this$getPosition.top,\n              left = _this$getPosition.left;\n\n          chrome.windows.create({\n            type: \'popup\',\n            url: msg.url,\n            width: width,\n            height: height,\n            top: top,\n            left: left\n          }, function (win) {\n            var newWindow = {\n              id: win.id,\n              index: nextIndex,\n              type: currentLayout\n            };\n            _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'INC_WINDOW\', newWindow);\n            _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'INC_NEXT_WINDOW_INDEX\', currentLayout);\n          });\n        }\n\n        if (msg.action === \'turn-up-window\') {\n          if (_store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.windows.length) {\n            _store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.windows.forEach(function (turnWindow) {\n              chrome.windows.get(turnWindow.id, function (window) {\n                if (!window) _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'REMOVE_WINDOW\', turnWindow.id);\n              });\n              chrome.windows.update(turnWindow.id, {\n                focused: true,\n                state: \'normal\'\n              });\n            });\n          }\n        }\n\n        if (msg.action === \'toggle-pin-last-window\') {\n          if (!_store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.pinned.active) {\n            var _this$getSizes2 = _this.getSizes(\'2x2\'),\n                _width = _this$getSizes2.width,\n                _height = _this$getSizes2.height;\n\n            chrome.windows.getLastFocused({\n              windowTypes: [\'popup\']\n            }, function (win) {\n              _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'PIN\', {\n                id: win.id,\n                status: true\n              });\n              chrome.windows.update(_store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.pinned.id, {\n                focused: true,\n                state: \'normal\',\n                width: _width,\n                height: _height,\n                top: 0,\n                left: 0\n              });\n            });\n          } else {\n            _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'UNPIN\');\n          }\n        }\n\n        if (msg.action === \'update-current-layout\') {\n          var _currentLayout = _store__WEBPACK_IMPORTED_MODULE_4__["default"].state.currentLayout;\n\n          var _this$getSizes3 = _this.getSizes(_currentLayout),\n              _width2 = _this$getSizes3.width,\n              _height2 = _this$getSizes3.height;\n\n          var _nextIndex = 0;\n\n          if (_store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.windows.length) {\n            _store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.windows.forEach(function (updatingWindow) {\n              if (!_nextIndex) {\n                _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'SET_NEXT_WINDOW_INDEX\', {\n                  type: _currentLayout,\n                  index: 1\n                });\n              } else {\n                _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'INC_NEXT_WINDOW_INDEX\', _currentLayout);\n              }\n\n              _nextIndex = _store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.nextIndex(_currentLayout);\n\n              var _this$getPosition2 = _this.getPosition(_currentLayout, _nextIndex),\n                  top = _this$getPosition2.top,\n                  left = _this$getPosition2.left;\n\n              chrome.windows.update(updatingWindow.id, {\n                focused: true,\n                state: \'normal\',\n                width: _width2,\n                height: _height2,\n                top: top,\n                left: left\n              });\n            });\n          }\n        }\n      });\n      chrome.windows.onFocusChanged.addListener(function (curId) {\n        if (_store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.pinned.active && _store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.pinned.id !== curId) {\n          chrome.windows.update(_store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.pinned.id, {\n            focused: true\n          });\n        }\n      });\n    }\n  }, {\n    key: "getSizes",\n    value: function getSizes(type) {\n      var sizes = {\n        width: 1000,\n        height: 800\n      };\n\n      switch (type) {\n        case \'1x1\':\n          break;\n\n        case \'1x2\':\n          sizes.width = parseInt(screen.width / 2, 10);\n          sizes.height = parseInt(screen.availHeight, 10);\n          break;\n\n        case \'2x1\':\n          sizes.height = parseInt(screen.availHeight / 2, 10);\n          sizes.width = parseInt(screen.width, 10);\n          break;\n\n        case \'2x2\':\n          sizes.width = parseInt(screen.width / 2, 10);\n          sizes.height = parseInt(screen.availHeight / 2, 10);\n          break;\n\n        default:\n          break;\n      }\n\n      return sizes;\n    }\n  }, {\n    key: "getPosition",\n    value: function getPosition(type) {\n      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;\n      var pos = {\n        top: 0,\n        left: 0\n      };\n\n      switch (type) {\n        case \'1x1\':\n          pos.left = parseInt(screen.width / 2 - this.getSizes(type).width / 2, 10);\n          pos.top = parseInt(screen.availHeight / 2 - this.getSizes(type).height / 2, 10);\n          break;\n\n        case \'1x2\':\n          if (index === 2) {\n            pos.left = parseInt(screen.width / 2, 10);\n          }\n\n          break;\n\n        case \'2x1\':\n          if (index === 2) {\n            pos.top = parseInt(screen.availHeight / 2, 10);\n          }\n\n          break;\n\n        case \'2x2\':\n          if (index > 1) {\n            if (index % 2 === 0) {\n              pos.left = parseInt(screen.width / 2, 10);\n            }\n\n            if (index > 2) {\n              pos.top = parseInt(screen.availHeight / 2, 10);\n            }\n          }\n\n          break;\n\n        default:\n          break;\n      }\n\n      return pos;\n    }\n  }, {\n    key: "onWindowRemoved",\n    value: function onWindowRemoved() {\n      chrome.windows.onRemoved.addListener(function (windowId) {\n        var _store$getters$window = _store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.windowById(windowId)[0],\n            index = _store$getters$window.index,\n            type = _store$getters$window.type;\n        _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'SET_NEXT_WINDOW_INDEX\', {\n          type: type,\n          index: index\n        });\n        _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'REMOVE_WINDOW\', windowId);\n\n        if (windowId === _store__WEBPACK_IMPORTED_MODULE_4__["default"].getters.pinned.id) {\n          _store__WEBPACK_IMPORTED_MODULE_4__["default"].commit(\'UNPIN\');\n        }\n      });\n    }\n  }]);\n\n  return Bg;\n}();\n\nvar bg = new Bg();\n\n//# sourceURL=webpack:///./background.js?'
+          '__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es.array.filter */ "../node_modules/core-js/modules/es.array.filter.js");\n/* harmony import */ var core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_filter__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var core_js_modules_es_array_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.array.find */ "../node_modules/core-js/modules/es.array.find.js");\n/* harmony import */ var core_js_modules_es_array_find__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_find__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/es.array.for-each */ "../node_modules/core-js/modules/es.array.for-each.js");\n/* harmony import */ var core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var core_js_modules_es_array_splice__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/es.array.splice */ "../node_modules/core-js/modules/es.array.splice.js");\n/* harmony import */ var core_js_modules_es_array_splice__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_splice__WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var core_js_modules_es_date_to_string__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! core-js/modules/es.date.to-string */ "../node_modules/core-js/modules/es.date.to-string.js");\n/* harmony import */ var core_js_modules_es_date_to_string__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_date_to_string__WEBPACK_IMPORTED_MODULE_4__);\n/* harmony import */ var core_js_modules_es_function_name__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! core-js/modules/es.function.name */ "../node_modules/core-js/modules/es.function.name.js");\n/* harmony import */ var core_js_modules_es_function_name__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_function_name__WEBPACK_IMPORTED_MODULE_5__);\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! core-js/modules/es.object.define-property */ "../node_modules/core-js/modules/es.object.define-property.js");\n/* harmony import */ var core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_define_property__WEBPACK_IMPORTED_MODULE_6__);\n/* harmony import */ var core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! core-js/modules/es.object.to-string */ "../node_modules/core-js/modules/es.object.to-string.js");\n/* harmony import */ var core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_7__);\n/* harmony import */ var core_js_modules_es_parse_int__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! core-js/modules/es.parse-int */ "../node_modules/core-js/modules/es.parse-int.js");\n/* harmony import */ var core_js_modules_es_parse_int__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_parse_int__WEBPACK_IMPORTED_MODULE_8__);\n/* harmony import */ var core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! core-js/modules/es.regexp.to-string */ "../node_modules/core-js/modules/es.regexp.to-string.js");\n/* harmony import */ var core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_9__);\n/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "../node_modules/core-js/modules/web.dom-collections.for-each.js");\n/* harmony import */ var core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each__WEBPACK_IMPORTED_MODULE_10__);\n/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./store */ "./store/index.js");\n\n\n\n\n\n\n\n\n\n\n\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }\n\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }\n\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }\n\n\n\nvar Bg =\n/*#__PURE__*/\nfunction () {\n  function Bg() {\n    _classCallCheck(this, Bg);\n\n    this.key = Math.random();\n    this.registerListeners();\n    this.initListeners();\n    this.onWindowRemoved();\n  }\n\n  _createClass(Bg, [{\n    key: "initListeners",\n    value: function initListeners() {\n      var _this = this;\n\n      chrome.runtime.onMessage.addListener(function (msg) {\n        if (msg.action === \'create-window\') {\n          var currentLayout = _store__WEBPACK_IMPORTED_MODULE_11__["default"].state.currentLayout;\n          var nextIndex = _store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.nextIndex(currentLayout);\n\n          var _this$getSizes = _this.getSizes(currentLayout),\n              width = _this$getSizes.width,\n              height = _this$getSizes.height;\n\n          var _this$getPosition = _this.getPosition(currentLayout, nextIndex),\n              top = _this$getPosition.top,\n              left = _this$getPosition.left;\n\n          chrome.windows.create({\n            type: \'popup\',\n            url: msg.url,\n            width: width,\n            height: height,\n            top: top,\n            left: left\n          }, function (win) {\n            var newWindow = {\n              id: win.id,\n              index: nextIndex,\n              type: currentLayout\n            };\n            _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'INC_WINDOW\', newWindow);\n            _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'INC_NEXT_WINDOW_INDEX\', currentLayout);\n          });\n        }\n\n        if (msg.action === \'turn-up-window\') {\n          if (_store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.windows.length) {\n            _store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.windows.forEach(function (turnWindow) {\n              chrome.windows.get(turnWindow.id, function (window) {\n                if (!window) _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'REMOVE_WINDOW\', turnWindow.id);\n              });\n              chrome.windows.update(turnWindow.id, {\n                focused: true,\n                state: \'normal\'\n              });\n            });\n          }\n        }\n\n        if (msg.action === \'toggle-pin-last-window\') {\n          if (!_store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.pinned.active) {\n            var _this$getSizes2 = _this.getSizes(\'2x2\'),\n                _width = _this$getSizes2.width,\n                _height = _this$getSizes2.height;\n\n            chrome.windows.getLastFocused({\n              windowTypes: [\'popup\']\n            }, function (win) {\n              _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'PIN\', {\n                id: win.id,\n                status: true\n              });\n              chrome.windows.update(_store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.pinned.id, {\n                focused: true,\n                state: \'normal\',\n                width: _width,\n                height: _height,\n                top: 0,\n                left: 0\n              });\n            });\n          } else {\n            _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'UNPIN\');\n          }\n        }\n\n        if (msg.action === \'update-current-layout\') {\n          var _currentLayout = _store__WEBPACK_IMPORTED_MODULE_11__["default"].state.currentLayout;\n\n          var _this$getSizes3 = _this.getSizes(_currentLayout),\n              _width2 = _this$getSizes3.width,\n              _height2 = _this$getSizes3.height;\n\n          var _nextIndex = 0;\n\n          if (_store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.windows.length) {\n            _store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.windows.forEach(function (updatingWindow) {\n              if (!_nextIndex) {\n                _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'SET_NEXT_WINDOW_INDEX\', {\n                  type: _currentLayout,\n                  index: 1\n                });\n              } else {\n                _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'INC_NEXT_WINDOW_INDEX\', _currentLayout);\n              }\n\n              _nextIndex = _store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.nextIndex(_currentLayout);\n\n              var _this$getPosition2 = _this.getPosition(_currentLayout, _nextIndex),\n                  top = _this$getPosition2.top,\n                  left = _this$getPosition2.left;\n\n              chrome.windows.update(updatingWindow.id, {\n                focused: true,\n                state: \'normal\',\n                width: _width2,\n                height: _height2,\n                top: top,\n                left: left\n              });\n            });\n          }\n        }\n      });\n      chrome.windows.onFocusChanged.addListener(function (curId) {\n        if (_store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.pinned.active && _store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.pinned.id !== curId) {\n          chrome.windows.update(_store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.pinned.id, {\n            focused: true\n          });\n        }\n      });\n    }\n  }, {\n    key: "getSizes",\n    value: function getSizes(type) {\n      var sizes = {\n        width: 1000,\n        height: 800\n      };\n\n      switch (type) {\n        case \'1x1\':\n          break;\n\n        case \'1x2\':\n          sizes.width = parseInt(screen.width / 2, 10);\n          sizes.height = parseInt(screen.availHeight, 10);\n          break;\n\n        case \'2x1\':\n          sizes.height = parseInt(screen.availHeight / 2, 10);\n          sizes.width = parseInt(screen.width, 10);\n          break;\n\n        case \'2x2\':\n          sizes.width = parseInt(screen.width / 2, 10);\n          sizes.height = parseInt(screen.availHeight / 2, 10);\n          break;\n\n        default:\n          break;\n      }\n\n      return sizes;\n    }\n  }, {\n    key: "getPosition",\n    value: function getPosition(type) {\n      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;\n      var pos = {\n        top: 0,\n        left: 0\n      };\n\n      switch (type) {\n        case \'1x1\':\n          pos.left = parseInt(screen.width / 2 - this.getSizes(type).width / 2, 10);\n          pos.top = parseInt(screen.availHeight / 2 - this.getSizes(type).height / 2, 10);\n          break;\n\n        case \'1x2\':\n          if (index === 2) {\n            pos.left = parseInt(screen.width / 2, 10);\n          }\n\n          break;\n\n        case \'2x1\':\n          if (index === 2) {\n            pos.top = parseInt(screen.availHeight / 2, 10);\n          }\n\n          break;\n\n        case \'2x2\':\n          if (index > 1) {\n            if (index % 2 === 0) {\n              pos.left = parseInt(screen.width / 2, 10);\n            }\n\n            if (index > 2) {\n              pos.top = parseInt(screen.availHeight / 2, 10);\n            }\n          }\n\n          break;\n\n        default:\n          break;\n      }\n\n      return pos;\n    }\n  }, {\n    key: "onWindowRemoved",\n    value: function onWindowRemoved() {\n      chrome.windows.onRemoved.addListener(function (windowId) {\n        var _store$getters$window = _store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.windowById(windowId)[0],\n            index = _store$getters$window.index,\n            type = _store$getters$window.type;\n        _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'SET_NEXT_WINDOW_INDEX\', {\n          type: type,\n          index: index\n        });\n        _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'REMOVE_WINDOW\', windowId);\n\n        if (windowId === _store__WEBPACK_IMPORTED_MODULE_11__["default"].getters.pinned.id) {\n          _store__WEBPACK_IMPORTED_MODULE_11__["default"].commit(\'UNPIN\');\n        }\n      });\n    }\n  }, {\n    key: "registerListeners",\n    value: function registerListeners() {\n      var listeningUrl = [\'*://docs.google.com/*\', \'*://fileredact.com/*\'];\n      chrome.webRequest.onHeadersReceived.addListener(function (info) {\n        var headers = info.responseHeaders; // eslint-disable-next-line no-plusplus\n\n        for (var i = headers.length - 1; i >= 0; --i) {\n          var header = headers[i].name.toLowerCase();\n\n          if (header === \'x-frame-options\' || header === \'frame-options\') {\n            headers.splice(i, 1);\n          }\n        }\n\n        return {\n          responseHeaders: headers\n        };\n      }, {\n        urls: [\'*://docs.google.com/*\'],\n        types: [\'sub_frame\', \'xmlhttprequest\']\n      }, [\'blocking\', \'responseHeaders\']); // chrome.webRequest.onBeforeSendHeaders.addListener(\n      //   this.onBeforeSendHeaders,\n      //   {\n      //     urls: listeningUrl,\n      //     tabId: -1,\n      //   },\n      //   [\'blocking\', \'requestHeaders\']\n      // );\n    }\n  }, {\n    key: "unregisterListeners",\n    value: function unregisterListeners() {\n      chrome.webRequest.onBeforeSendHeaders.removeListener(this.onBeforeSendHeaders);\n    }\n  }, {\n    key: "onBeforeSendHeaders",\n    value: function onBeforeSendHeaders(details) {\n      debugger;\n      if (!details.requestHeaders) return {};\n      var requestKey = details.requestHeaders.find(function (h) {\n        return h.name === \'request-key\';\n      });\n\n      if (requestKey && requestKey.value === this.key.toString()) {\n        this.id = details.requestId;\n        details.requestHeaders = details.requestHeaders.filter(function (h) {\n          return h.name.toLowerCase() != "user-agent" || h.name != "request-key";\n        });\n        details.requestHeaders.push({\n          name: \'User-Agent\',\n          value: \'Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; SCH-I535 Build/KOT49H) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30\'\n        });\n        return {\n          requestHeaders: details.requestHeaders\n        };\n      }\n\n      return {};\n    }\n  }]);\n\n  return Bg;\n}();\n\nvar bg = new Bg();\n\n//# sourceURL=webpack:///./background.js?'
         );
 
         /***/
