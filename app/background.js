@@ -5,7 +5,7 @@ class Bg {
     this.key = Math.random();
     this.initListeners();
     this.onWindowRemoved();
-    this.enableIframeAccess();
+    //this.enableIframeAccess();
   }
 
   initListeners() {
@@ -18,22 +18,14 @@ class Bg {
         chrome.windows.create(
           {
             type: 'popup',
-            url: msg.url, //'/popup/window.html',
+            url: msg.url,
             width,
             height,
             top,
             left,
           },
           win => {
-            // node.onload = () => {
-            //   this.processingNodes([...node.contentWindow.document.getElementsByTagName('*')]);
-            // }
-            chrome.windows.getCurrent({ populate: true }, w => {
-              console.log(w.tabs[0].id);
-              chrome.tabs.executeScript(w.tabs[0].id, { code: 'console.log("vasja")' }, res => {
-                debugger;
-              });
-            });
+            chrome.windows.getCurrent({ populate: true }, w => {});
             const newWindow = {
               id: win.id,
               index: nextIndex,
@@ -186,10 +178,10 @@ class Bg {
   enableIframeAccess() {
     chrome.webRequest.onHeadersReceived.addListener(
       r => {
-        const responseHeaders = r.responseHeaders.filter(h => !['x-frame-options', 'frame-options'].includes(h.name.toLowerCase()));
+        const responseHeaders = r.responseHeaders.filter(h => !['x-frame-options', 'content-security-policy'].includes(h.name.toLowerCase()));
         return { responseHeaders };
       },
-      { urls: ['*://docs.google.com/*', '*://play.google.com/*', '*://fileredact.com/*'], types: ['sub_frame'] },
+      { urls: ['*://docs.google.com/*'], types: ['sub_frame'] },
       ['blocking', 'responseHeaders']
     );
   }
