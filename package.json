@@ -2,7 +2,7 @@
   "name": "office_file_redactor",
   "version": "1.0.0",
   "description": "office_file_redactor",
-  "author": "alexey.nik <blajnoy@gmail.com>",
+  "author": "alexey.nik",
   "scripts": {
     "lint": "eslint --ext .js,.vue app",
     "precommit": "pretty-quick --staged",

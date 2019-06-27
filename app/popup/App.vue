@@ -59,12 +59,9 @@ export default {
   data() {
     return {
       urls: {
-        /*doc: 'http://fileredact.com/doc/',
+        doc: 'http://fileredact.com/doc/',
         sheet: 'http://fileredact.com/sheet/',
-        presentation: 'http://fileredact.com/presentation/',*/
-        doc: 'https://docs.google.com/create',
-        sheet: 'https://sheets.google.com/create',
-        presentation: 'https://slides.google.com/create',
+        presentation: 'http://fileredact.com/presentation/',
       },
       showContactForm: false,
     };
